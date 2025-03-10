@@ -28,9 +28,10 @@ parser.add_argument(
         'Opções: 1 - Naive Bayes, 2 - Tree Decision, 3 - Knn, 4 - Heterogeneous'
 )
 parent_dir = "path_for_results"
-datasets_dir = "../FlexCon/datasets"
-datasets = sorted(os.listdir(datasets_dir))
-init_labelled = [0.03, 0.05, 0.08, 0.10, 0.13, 0.15, 0.18, 0.20, 0.23, 0.25]
+#datasets_dir = "./datasets"
+#datasets = sorted(os.listdir(datasets_dir))
+datasets = ["Iris.csv"]
+init_labelled = [0.25]
 
 args = parser.parse_args()
 
@@ -91,7 +92,6 @@ for threshold in thresholds:
                 df = read_csv('datasets/'+dataset, header=0)
                 seed(214)
                 kfold = StratifiedKFold(n_splits=10)
-                fold = 1
                 _instances = df.iloc[:,:-1].values #X
                 _target_unlabelled = df.iloc[:,-1].values #Y
                 # _target_unlabelled_copy = _target_unlabelled.copy()
@@ -106,9 +106,6 @@ for threshold in thresholds:
                     labelled_instances = labelled_level
 
                     rounds += 1
-
-                    if (fold == 1):
-                        fold += 1
 
                     y = select_labels(y_train, X_train, labelled_instances)
 
@@ -152,7 +149,7 @@ for threshold in thresholds:
                         path,
                         labelled_level,
                         rounds
-                        )
+                    )
 
                     fold_result_f1_score.append(result_f1)
 

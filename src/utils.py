@@ -87,7 +87,7 @@ def result(option, dataset, y_test, y_pred, path, labelled_level, rounds):
         rounds (int): Número da rodada atual.
 
     Returns:
-        float: F1-Score (macro) multiplicado por 100.
+        float: F1-Score (macro).
     """
     acc = accuracy_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred, average="macro")
@@ -102,9 +102,9 @@ def result(option, dataset, y_test, y_pred, path, labelled_level, rounds):
     file_name = committee_files.get(option, "Comite_Heterogeneo_.csv")
 
     with open(f'{path}/{file_name}', 'a', encoding='utf-8') as f:
-        f.write(f'\n{rounds},"{dataset}",{labelled_level},{acc},{f1}')
+        f.write(f'\n{rounds},"{dataset}",{labelled_level},{acc * 100},{f1 * 100}')
 
-    return f1 * 100
+    return f1
 
 def calculate_mean_stdev(
     fold_result_acc,
@@ -141,5 +141,5 @@ def calculate_mean_stdev(
 
     with open(f'{path}/{file_name}', 'a', encoding='utf-8') as f:
         f.write(
-            f'\n"{dataset}",{labelled_level},{acc_average},{standard_deviation_acc},{f1_average},{standard_deviation_f1}'
+            f'\n"{dataset}",{labelled_level},{acc_average * 100},{standard_deviation_acc * 100},{f1_average * 100},{standard_deviation_f1 * 100}'
         )

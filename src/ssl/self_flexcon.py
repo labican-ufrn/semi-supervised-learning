@@ -116,7 +116,6 @@ class SelfFlexCon(BaseFlexConC):
 
             # Add newly labeled confident predictions to the dataset
             has_label[selected_full] = True
-            self.add_new_labeled(selected_full, selected, pred)
             self.update_memory(np.nonzero(~has_label)[0], pred)
             # Predict on the labeled samples
             try:
@@ -141,6 +140,15 @@ class SelfFlexCon(BaseFlexConC):
                     X[safe_mask(X, self.init_labeled_)],
                     y[self.init_labeled_],
                     self.base_estimator_select_,
+                )
+
+                self.add_new_labeled(
+                    selected_full,
+                    selected,
+                    local_acc,
+                    init_acc,
+                    max_proba,
+                    pred
                 )
                 self.new_threshold(local_acc, init_acc)
             except ValueError:
