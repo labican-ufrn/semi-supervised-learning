@@ -11,6 +11,7 @@ from xgboost import XGBClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 
+from sklearn.semi_supervised import SelfTrainingClassifier
 from selfOld import MySelfOld
 from selfNew import MySelfNew
 
@@ -19,7 +20,7 @@ from src.utils import select_labels
 
 
 # Separa/prepara a base de dados
-df = read_csv('datasets/Iris.csv', header=0)
+df = read_csv('datasets/Car.csv', header=0)
 X = df.iloc[:,:-1].values
 y = df.iloc[:,-1].values
 
@@ -84,7 +85,7 @@ for name, model in classifiers.items():
     if name == "Logistic Regression":
         model = model(max_iter=1000)
     elif name == "Neural Network":
-        model = model(max_iter=2000)
+        model = model(max_iter=3000)
     else:
         model = model()
 
@@ -105,7 +106,7 @@ best_model = classifiers[best_model_name]
 
 
 # Inicia e treina o especialista com o percentual inicial de instâncias rotuladas
-specialist = MySelfOld(base_estimator=best_model(), threshold=0.95, max_iter=100, verbose=True)
+specialist = MySelfOld(base_estimator=best_model(), threshold=0.95, max_iter=10, verbose=True)
 y_2 = select_labels(y_train_all, X_train_all, 0.25)
 
 # Contar instâncias não rotuladas antes do treinamento
@@ -141,27 +142,27 @@ print(f"Número de iterações realizadas: {specialist.n_iter_}")
 ##################################################
 
 
-# Cria o comitê
-models = []
-for name, model in classifiers.items():
+# # Cria o comitê
+# models = []
+# for name, model in classifiers.items():
 
-    if name == "Logistic Regression":
-        model = model(max_iter=1000)
-    elif name == "Neural Network":
-        model = model(max_iter=2000)
-    else:
-        model = model()
+#     if name == "Logistic Regression":
+#         model = model(max_iter=1000)
+#     elif name == "Neural Network":
+#         model = model(max_iter=3000)
+#     else:
+#         model = model()
 
-    models.append((name, model))
+#     models.append((name, model))
 
-ensemble = VotingClassifier(estimators=models, voting='soft', verbose=True)
+# ensemble = VotingClassifier(estimators=models, voting='soft', verbose=True)
 
-# Treina o comitê com o percentual inicial de instâncias rotuladas
-ensemble.fit(X_train, y_train)
+# # Treina o comitê com o percentual inicial de instâncias rotuladas
+# ensemble.fit(X_train, y_train)
 
-# Armazena as predições do comitê
-y_pred_comite = ensemble.predict(X_test_all)
+# # Armazena as predições do comitê
+# y_pred_comite = ensemble.predict(X_test_all)
 
-# Calcula a acurácia do comitê
-accuracy_comite = accuracy_score(y_test_all, y_pred_comite)
-print(f"\nAcurácia do Comitê ({best_model_name}): {accuracy_comite:.4f}")
+# # Calcula a acurácia do comitê
+# accuracy_comite = accuracy_score(y_test_all, y_pred_comite)
+# print(f"\nAcurácia do Comitê ({best_model_name}): {accuracy_comite:.4f}")
