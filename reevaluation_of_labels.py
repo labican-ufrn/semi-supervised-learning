@@ -14,13 +14,14 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.semi_supervised import SelfTrainingClassifier
 from selfOld import MySelfOld
 from selfNew import MySelfNew
+from selfNewEssemble import MySelfNewEssemble
 
 
 from src.utils import select_labels
 
 
 # Separa/prepara a base de dados
-df = read_csv('datasets/Car.csv', header=0)
+df = read_csv('datasets/Btsc.csv', header=0)
 X = df.iloc[:,:-1].values
 y = df.iloc[:,-1].values
 
@@ -106,7 +107,7 @@ best_model = classifiers[best_model_name]
 
 
 # Inicia e treina o especialista com o percentual inicial de instâncias rotuladas
-specialist = MySelfOld(base_estimator=best_model(), threshold=0.95, max_iter=10, verbose=True)
+specialist = MySelfNewEssemble(base_estimator=best_model(), threshold=0.95, max_iter=10, silhouette_threshold=-0.2, verbose=True)
 y_2 = select_labels(y_train_all, X_train_all, 0.25)
 
 # Contar instâncias não rotuladas antes do treinamento
@@ -166,3 +167,37 @@ print(f"Número de iterações realizadas: {specialist.n_iter_}")
 # # Calcula a acurácia do comitê
 # accuracy_comite = accuracy_score(y_test_all, y_pred_comite)
 # print(f"\nAcurácia do Comitê ({best_model_name}): {accuracy_comite:.4f}")
+
+
+
+
+
+
+
+
+# 1. Estamos usando esses classificadores:
+#     KNN,
+#     Naive Bayes,
+#     Decision Tree,
+#     Random Forest,
+#     XGBoost,
+#     Logistic Regression,
+#     Neural Network
+
+
+# 2. Trainamos todos os classificadores com o percentual inicialmente rotulado da base
+
+
+# 3. Escolhemos aquele com a melhor acurácio para ser o especialista (SelfTraining)
+
+
+# 4. O especialista usa 0.95 fixo de threshold para incluir as instâncias
+
+
+# 5. Não estamos obrigando todas as instãncias serem classificadas
+
+
+# 6. Estamos usando silhouette_threshold=-0.2 (número mágico)
+
+
+# 7. Ainda não estamos usando comitê nem a sua lógica de votação

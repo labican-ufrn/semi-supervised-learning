@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.base import clone
 from sklearn.utils import check_array
-from sklearn.metrics import pairwise_distances, silhouette_samples
+from sklearn.metrics import silhouette_samples
 
 
 class MySelfNew:
@@ -90,8 +90,6 @@ class MySelfNew:
 
             # Re-treina o classificador com os novos rótulos
             X_labeled, y_labeled = X[labeled_mask], self.transduction_[labeled_mask]
-
-            #if self.n_iter_ % 5 == 0:
 
             silhouette_vals = silhouette_samples(X_labeled, y_labeled)
 
