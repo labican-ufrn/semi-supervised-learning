@@ -1,0 +1,16 @@
+LICENSE
+README.md
+setup.py
+mlabican/__init__.py
+mlabican/base_flexcons.py
+mlabican/flexcon.py
+mlabican/flexconC.py
+mlabican/flexconG.py
+mlabican/selfTrainingInitial.py
+mlabican.egg-info/PKG-INFO
+mlabican.egg-info/SOURCES.txt
+mlabican.egg-info/dependency_links.txt
+mlabican.egg-info/requires.txt
+mlabican.egg-info/top_level.txt
+tests/testFlex.py
+tests/testSelf.py

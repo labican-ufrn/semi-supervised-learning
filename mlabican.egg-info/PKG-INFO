@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: mlabican
+Version: 1.0.1
+Summary: Biblioteca de teste do Labican-UFRN
+Author: Luiz Miguel
+Author-email: luiz.santos.090@ufrn.edu.br
+License: MIT License
+Keywords: mlabican
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: scikit-learn
+Requires-Dist: numpy
+
+# Biblioteca de teste do Labican-UFRN
