@@ -1,7 +1,7 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: mlabican
-Version: 1.0.1
-Summary: Biblioteca de teste do Labican-UFRN
+Version: 1.1.0
+Summary: Biblioteca do Labican-UFRN
 Author: Luiz Miguel
 Author-email: luiz.santos.090@ufrn.edu.br
 License: MIT License
@@ -11,5 +11,15 @@ Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: scikit-learn
 Requires-Dist: numpy
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: keywords
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
 
-# Biblioteca de teste do Labican-UFRN
+# Biblioteca do Labican-UFRN

@@ -10,7 +10,7 @@ class SelfTrainingClassifier:
         criterion="threshold",
         threshold=0.75,
         k_best=10,
-        max_iter=10,
+        max_iter=100,
         verbose=False
     ):
         self.base_estimator = base_estimator

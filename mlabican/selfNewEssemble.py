@@ -12,7 +12,7 @@ class SelfWithRevaluationEssemble:
         criterion="threshold",
         threshold=0.75,
         k_best=10,
-        max_iter=10,
+        max_iter=100,
         silhouette_threshold=-0.2,
         verbose=False
     ):
