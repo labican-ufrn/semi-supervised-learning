@@ -1,8 +1,9 @@
 Metadata-Version: 2.4
 Name: mlabican
-Version: 1.1.0
-Summary: Biblioteca do Labican-UFRN
-Author: Luiz Miguel
+Version: 1.1.1
+Summary: Algoritmos de Self-Training com estratégias de reavaliação de pseudo-rótulos para aprendizado semissupervisionado
+Home-page: https://pypi.org/project/mlabican/
+Author: Luiz Miguel Santos Silva
 Author-email: luiz.santos.090@ufrn.edu.br
 License: MIT License
 Keywords: mlabican
@@ -15,6 +16,7 @@ Dynamic: author
 Dynamic: author-email
 Dynamic: description
 Dynamic: description-content-type
+Dynamic: home-page
 Dynamic: keywords
 Dynamic: license
 Dynamic: license-file
@@ -23,3 +25,10 @@ Dynamic: requires-python
 Dynamic: summary
 
 # Biblioteca do Labican-UFRN
+
+**mlabican** é uma biblioteca Python para **aprendizado semissupervisionado**, focada em algoritmos baseados em **Self-Training** e suas variantes. Ela fornece implementações robustas e reutilizáveis que permitem treinar modelos com poucos dados rotulados, reavaliando pseudo-rótulos de maneira inteligente com uso de silhueta, comitês de classificadores e votação ponderada.
+
+## 📦 Instalação
+
+```bash
+pip install mlabican
