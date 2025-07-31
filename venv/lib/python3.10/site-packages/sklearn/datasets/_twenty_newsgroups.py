@@ -22,8 +22,8 @@ test sets. The compressed dataset size is around 14 Mb compressed. Once
 uncompressed the train set is 52 MB and the test set is 34 MB.
 """
 
-# Copyright (c) 2011 Olivier Grisel <olivier.grisel@ensta.org>
-# License: BSD 3 clause
+# Authors: The scikit-learn developers
+# SPDX-License-Identifier: BSD-3-Clause
 
 import codecs
 import logging
@@ -115,7 +115,7 @@ def strip_newsgroup_header(text):
 
 
 _QUOTE_RE = re.compile(
-    r"(writes in|writes:|wrote:|says:|said:" r"|^In article|^Quoted from|^\||^>)"
+    r"(writes in|writes:|wrote:|says:|said:|^In article|^Quoted from|^\||^>)"
 )
 
 
