@@ -11,11 +11,15 @@ from sklearn.naive_bayes import GaussianNB as Naive
 
 from src.ssl.ensemble import Ensemble
 from src.ssl.self_flexcon import SelfFlexCon
-from src.utils import calculate_mean_stdev, list_knn_full, list_knn_Prelax, \
-    list_knn_seeds, list_tree, result, select_labels
-
-crs = [0.05]
-thresholds = [0.95]
+from src.utils import (
+    calculate_mean_stdev,
+    list_knn_full,
+    list_knn_Prelax,
+    list_knn_seeds,
+    list_tree,
+    result,
+    select_labels,
+)
 
 warnings.simplefilter("ignore")
 
@@ -27,16 +31,8 @@ parser.add_argument(
     help='Escolha um classificador para criar um cômite.'
         'Opções: 1 - Naive Bayes, 2 - Tree Decision, 3 - Knn, 4 - Heterogeneous'
 )
-parent_dir = "path_for_results"
-#datasets_dir = "./datasets"
-#datasets = sorted(os.listdir(datasets_dir))
-datasets = ["Iris.csv"]
-init_labelled = [0.25]
 
 args = parser.parse_args()
-
-fold_result_acc_final = []
-fold_result_f1_score_final = []
 
 if args.classifier >= 4 or args.classifier < 0:
     print(
@@ -46,68 +42,63 @@ if args.classifier >= 4 or args.classifier < 0:
     )
     exit()
 
+#### Variable initializations...
+#datasets_dir = "./datasets"
+#datasets = sorted(os.listdir(datasets_dir))
+datasets = ["Madelon.csv"]
+
+crs: list[float] = [0.05]
+thresholds: list[float] = [0.95]
+init_labelled: list[float] = [0.25]
+fold_result_acc_final: list[float] = []
+fold_result_f1_score_final: list[float] = []
+
+comite_map = {
+    1: "Comite_Naive_",
+    2: "Comite_Tree_",
+    3: "Comite_KNN_",
+}
+comite: str = comite_map.get(args.classifier, "Comite_Heterogeneo_")
+
+result_folder: str = 'path_for_results'
+os.makedirs(result_folder, exist_ok=True)
+acc_result_file: str = f'{comite}.csv'
+f1_result_file: str = f'{comite}F.csv'
+
+file_path = os.path.join(result_folder, acc_result_file)
+
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write('"ROUNDS", "DATASET", "LABELLED-LEVEL", "ACC", "F1-SCORE"')
+
 for threshold in thresholds:
-
-    comite_map = {
-        1: "Comite_Naive_",
-        2: "Comite_Tree_",
-        3: "Comite_KNN_"
-    }
-
-    comite = comite_map.get(args.classifier, "Comite_Heterogeneo_")
-
-    path = os.path.join(parent_dir)
-
-    folder_check_csv = f'path_for_results'
-    os.makedirs(folder_check_csv, exist_ok=True)
-
-    file_check = f'{comite}.csv'
-    check = os.path.join(folder_check_csv, file_check)
-
-    if not os.path.exists(check):
-        with open(f'{folder_check_csv}/{file_check}', 'a') as f:
-            f.write(
-                f'"ROUNDS", "DATASET","LABELLED-LEVEL","ACC","F1-SCORE"'
-            )
-
-    file_check = f'{comite}F.csv'
-    check = os.path.join(folder_check_csv, file_check)
-
-    if not os.path.exists(check):
-        with open(f'{folder_check_csv}/{file_check}', 'a') as f:
-            header = (
-                '"DATASET","LABELLED-LEVEL","ACC-AVERAGE",'
-                '"STANDARD-DEVIATION-ACC","F1-SCORE-AVERAGE",'
-                '"STANDARD-DEVIATION-F1-SCORE"'
-            )
-            f.write(header)
-
     for cr in crs:
         for labelled_level in init_labelled:
             for dataset in datasets:
+
                 comite = Ensemble(SelfFlexCon, cr=cr, threshold=threshold)
 
-                fold_result_acc = []
-                fold_result_f1_score = []
-                df = read_csv('datasets/'+dataset, header=0)
+                df = read_csv(os.path.join('datasets/', dataset), header=0)
                 seed(214)
                 kfold = StratifiedKFold(n_splits=10)
-                _instances = df.iloc[:,:-1].values #X
-                _target_unlabelled = df.iloc[:,-1].values #Y
-                # _target_unlabelled_copy = _target_unlabelled.copy()
+                _instances = df.iloc[:,:-1].values
+                _target = df.iloc[:,-1].values
 
                 # round counter
                 rounds = 0
-                for train, test in kfold.split(_instances, _target_unlabelled):
+                fold_result_acc = []
+                fold_result_f1_score = []
+
+                for train, test in kfold.split(_instances, _target):
                     X_train = _instances[train]
                     X_test = _instances[test]
-                    y_train = _target_unlabelled[train]
-                    y_test = _target_unlabelled[test]
-                    labelled_instances = labelled_level
+                    y_train = _target[train]
+                    y_test = _target[test]
 
+                    # TODO: Maybe change for line to the following line.
+                    # for round, (train, test) in enumerate(kfold.split(_instances, _target)):
                     rounds += 1
 
-                    y = select_labels(y_train, X_train, labelled_instances)
+                    y = select_labels(y_train, X_train, labelled_level)
 
                     if (args.classifier == 1) or (args.classifier == 4):
                         for i in range(9):
@@ -146,9 +137,9 @@ for threshold in thresholds:
                         dataset,
                         y_test,
                         y_pred,
-                        path,
+                        result_folder,
                         labelled_level,
-                        rounds
+                        rounds,
                     )
 
                     fold_result_f1_score.append(result_f1)
@@ -159,16 +150,16 @@ for threshold in thresholds:
                     fold_result_acc,
                     args.classifier,
                     labelled_level,
-                    path,
+                    result_folder,
                     dataset,
-                    fold_result_f1_score
+                    fold_result_f1_score,
                 )
 
 calculate_mean_stdev(
     fold_result_acc_final,
     args.classifier,
     labelled_level,
-    path,
+    result_folder,
     'FINAL-RESULTS',
     fold_result_f1_score_final
 )

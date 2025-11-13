@@ -71,11 +71,51 @@ def select_labels(y_train, X_train, labelled_percentage):
     mask = np.ones(len(X_train), bool)
     mask[instances] = 0
     y_train[mask] = -1
+
     return y_train
 
-def result(option, dataset, y_test, y_pred, path, labelled_level, rounds):
+
+# TODO: Repensar essa função, vou ajustar a doc para o que eu espero dela.
+def result(
+    option: int,
+    dataset: str,
+    y_test: list[int],
+    y_pred: list[int],
+    path: str,
+    labelled_level: float,
+    rounds: int,
+) -> None:
     """
-    Salva os resultados dos comitês em arquivos CSV com base na opção escolhida.
+    Salvar os resultados que foram obtidos em cada fold para o comitê em um
+    único arquivo.
+
+    Tarefas:
+        - [] saber qual o nome do arquivo que você tem que salvar. idealmente,
+            eu devo passar o nome do arquivo já sendo um caminho válido.
+        - [] o dataset é necessário :think:, é bom, pois ajuda na análise de
+            resultados.
+        - [] receber a métrica propriamente dita e não deve ser calculado NADA
+            nesta função.
+        - [] Não deve multiplicar nenhum valor.
+
+    Assinatura sugerida:
+    ```save_results(
+        dataset: str,
+        file_name: str,
+        labelled_level: float,
+        round/_it_eration: float,
+        measures: list[float],
+    )```
+
+    measures será uma lista que contém todas as métricas que deverão ser salvas.
+    A propria função irá se encarregar de fazer a trasformação dessa lista em str
+    Ex:
+         acc,   f1,  outra
+        [0.89, 0.56, 0.10]
+
+    isso é algo assim:
+    metrics = ', '.join(str(f) for f in [0.89, 0.56, 0.1])
+    metrics = ', '.join(map(str, float_list))
 
     Args:
         option (int): Identificador do comitê.
@@ -85,9 +125,6 @@ def result(option, dataset, y_test, y_pred, path, labelled_level, rounds):
         path (str): Caminho do diretório para salvar os arquivos.
         labelled_level (float): Percentual de dados rotulados na iteração.
         rounds (int): Número da rodada atual.
-
-    Returns:
-        float: F1-Score (macro).
     """
     acc = accuracy_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred, average="macro")
@@ -102,20 +139,21 @@ def result(option, dataset, y_test, y_pred, path, labelled_level, rounds):
     file_name = committee_files.get(option, "Comite_Heterogeneo_.csv")
 
     with open(f'{path}/{file_name}', 'a', encoding='utf-8') as f:
-        f.write(f'\n{rounds},"{dataset}",{labelled_level},{acc * 100},{f1 * 100}')
+        f.write(f'\n{rounds},"{dataset}",{labelled_level},{acc},{f1}')
 
-    return f1
 
+# TODO: Pensar em como juntar com a função `result`
 def calculate_mean_stdev(
-    fold_result_acc,
-    option,
-    labelled_level,
-    path,
-    dataset,
-    fold_result_f1_score
+    fold_result_acc: list[float],
+    option: int,
+    labelled_level: float,
+    path: str,
+    dataset: str,
+    fold_result_f1_score: list[float],
 ):
     """
-    Calcula e salva a média e o desvio padrão de ACC e F1-Score para diferentes comitês.
+    Calcula e salva a média e o desvio padrão de ACC e F1-Score para diferentes
+        comitês.
 
     Args:
         fold_result_acc (list): Lista de ACCs por rodada.
@@ -125,10 +163,10 @@ def calculate_mean_stdev(
         dataset (str): Nome do dataset.
         fold_result_f1_score (list): Lista de F1-Scores por rodada.
     """
-    acc_average = mean(fold_result_acc)
-    standard_deviation_acc = stdev(fold_result_acc)
-    f1_average = mean(fold_result_f1_score)
-    standard_deviation_f1 = stdev(fold_result_f1_score)
+    acc_avg = mean(fold_result_acc)
+    f1_avg = mean(fold_result_f1_score)
+    sd_acc = stdev(fold_result_acc)
+    sd_f1 = stdev(fold_result_f1_score)
 
     committee_files = {
         1: "Comite_Naive_F.csv",
@@ -141,5 +179,5 @@ def calculate_mean_stdev(
 
     with open(f'{path}/{file_name}', 'a', encoding='utf-8') as f:
         f.write(
-            f'\n"{dataset}",{labelled_level},{acc_average * 100},{standard_deviation_acc * 100},{f1_average * 100},{standard_deviation_f1 * 100}'
+            f'\n"{dataset}",{labelled_level},{acc_avg},{sd_acc},{f1_avg},{sd_f1}'
         )

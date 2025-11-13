@@ -101,10 +101,17 @@ class BaseFlexConC(SelfTrainingClassifier):
         """
         Responsável por calcular o novo limiar.
 
+        Fórmula:
+            $$
+            self.threshold = \frac{self.threshold + conf\_media + \frac{qtd\_instacias\_add}{total\_nao\_rolutado}}{3}
+            $$
+
         Args:
             - local_measure: valor da acurácia do modelo treinado.
             - init_acc: valor da acurácia inicial.
         """
+        # TODO: Implementar a fórmula, descrita nos args
+        # TODO: Reavaliação de rótulos no flexcon
 
         if local_measure > (init_acc + 0.01) and (
             (self.threshold - self.cr) > 0.0
@@ -124,6 +131,16 @@ class BaseFlexConC(SelfTrainingClassifier):
         """
         Atualiza a matriz de instâncias rotuladas.
 
+             A   B
+            0.2 0.8
+            0.7 0.3
+            0.6 0.4
+            0.51 0.49
+
+             A   B
+             0   1
+             1   0
+             1   0
         Args:
             - instances: instâncias.
             - labels: rotulos.
