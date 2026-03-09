@@ -67,25 +67,25 @@ class Ensemble:
         """
         self.ensemble = []
 
-    def fit_ensemble(self, instances, classes) -> None:
+    def fit_ensemble(self, instances, labels) -> None:
         """
         Treina os classificadores presentes no cômite
         """
 
         for classifier in self.ensemble:
-            self.fit_single_classifier(classifier, instances, classes)
+            self.fit_single_classifier(classifier, instances, labels)
 
-    def fit_single_classifier(self, classifier, instances, classes) -> object:
+    def fit_single_classifier(self, classifier, instances, labels) -> object:
         """
         Treinar cada classificador iterativamente
 
         Args:
             classifier: classificador do cômite
             instances: instâncias da base de dados
-            classes: classes da base de dados
+            labels: classes da base de dados
         """
 
-        return classifier.fit(instances, classes)
+        return classifier.fit(instances, labels)
 
     def predict_one_classifier(self, classifier, instances) -> np.ndarray:
         """
@@ -104,7 +104,7 @@ class Ensemble:
         Args:
             instances: instâncias da base de dados
         """
-        y_pred = np.array([], dtype="int64")
+        y_pred = np.array([], dtype='int64')
 
         for instance in instances:
             pred = []
