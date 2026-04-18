@@ -47,9 +47,12 @@ if args.classifier >= 4 or args.classifier < 0:
 #datasets = sorted(os.listdir(datasets_dir))
 datasets = ["Madelon.csv"]
 
-crs: list[float] = [0.05]
-thresholds: list[float] = [0.95]
-init_labelled: list[float] = [0.25]
+crs: list[float] = [0.05]  # Valores de CR (fator de mudança do threshold) a serem testados ele varia ±
+thresholds: list[float] = [0.95]  # Valor  inicial do threshold, o threshold é atualizado durante a execução do algoritmo.
+init_labelled: list[float] = [0.25]  # Níveis de rotulagem inicial a serem testados, ou seja, a porcentagem de instâncias rotuladas no início do processo.
+
+#############################
+# INÍCIO CONFIGURAÇÃO DE PASTAS E LISTA DE RESULTADOS
 fold_result_acc_final: list[float] = []
 fold_result_f1_score_final: list[float] = []
 
@@ -70,11 +73,15 @@ file_path = os.path.join(result_folder, acc_result_file)
 with open(file_path, 'w', encoding='utf-8') as f:
     f.write('"ROUNDS", "DATASET", "LABELLED-LEVEL", "ACC", "F1-SCORE"')
 
+# FIM CONFIGURAÇÃO
+#############################
+
+# Loop para testar diferentes combinações de threshold, CR, níveis de rotulagem inicial e base de dados.
 for threshold in thresholds:
     for cr in crs:
         for labelled_level in init_labelled:
             for dataset in datasets:
-
+                # Setup do experimento
                 comite = Ensemble(SelfFlexCon, cr=cr, threshold=threshold)
 
                 df = read_csv(os.path.join('datasets/', dataset), header=0)
@@ -119,6 +126,7 @@ for threshold in thresholds:
                             for i in list_knn_full:
                                 comite.add_classifier(i)
 
+                    # Critical point: o processo de treinamento do comitê e a avaliação de sua acurácia. O método fit_ensemble é chamado para treinar o comitê usando os dados de treinamento.
                     comite.fit_ensemble(X_train, y)
 
                     y_pred = comite.predict(X_test)

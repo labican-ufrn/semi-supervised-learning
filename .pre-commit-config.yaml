@@ -17,6 +17,7 @@ repos:
       args: ['discover', 'tests']
       language: system
       pass_filenames: false
+      verbose: true
     - id: isort
       name: Isort
       entry: isort

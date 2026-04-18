@@ -6,14 +6,16 @@ from src.ssl.flexcon import BaseFlexConC
 
 class SelfFlexCon(BaseFlexConC):
     """
-    _summary_
+    _summary_.
+
+    FlexCon-C1(s) -> Flexible Confidence with Classifier (using confidences sum).
 
     Args:
-        base_estimator (_type_): _description_
+        estimator (_type_): _description_
     """
-    def __init__(self, base_estimator, **kwargs):
+    def __init__(self, estimator, **kwargs):
         super().__init__(
-            base_estimator=base_estimator,
+            estimator=estimator,
             **kwargs
         )
         self.n_iter_ = 0
@@ -21,7 +23,7 @@ class SelfFlexCon(BaseFlexConC):
     # def __str__(self):
     #     msg = super().__str__()
     #     msg += (
-    #         f"\nClassificador {self.base_estimator}\n"
+    #         f"\nClassificador {self.estimator}\n"
     #         f"Outros Parâmetro:\n"
     #         f"CR: {self.cr}\t Threshold: {self.threshold}\n"
     #         f"Máximo IT: {self.max_iter}\n"
@@ -46,13 +48,6 @@ class SelfFlexCon(BaseFlexConC):
         self : object
             Fitted estimator.
         """
-        X, y = self._validate_data(
-            X,
-            y,
-            accept_sparse=["csr", "csc", "lil", "dok"],
-            force_all_finite=False,
-        )
-
         if y.dtype.kind in ["U", "S"]:
             raise ValueError(
                 "y has dtype string. If you wish to predict on "
@@ -60,12 +55,26 @@ class SelfFlexCon(BaseFlexConC):
                 " as the label for unlabeled samples."
             )
 
+        # lista auxiliar para marcar quais instâncias são rotuladas ou não.
+        # O processo de treinamento do FlexCon-C envolve a identificação de
+        # quais instâncias são rotuladas e quais são não rotuladas, e essa
+        # lista é usada para acompanhar esse status ao longo do processo.
         has_label: list = y != -1
-        self.size_y = len(y)
-        self.cl_memory = [[0] * np.unique(y[has_label]) for _ in range(len(X))]
-
         if np.all(has_label):
             raise ValueError("y contains no unlabeled sample")
+
+        self.size_y = len(y)
+
+        # Memória de classificação para cada classe, ou seja, uma matriz
+        #  que armazena as classificações feitas pelo modelo para cada
+        # instância e cada classe. Essa memória é atualizada a cada iteração
+        # do processo de treinamento, permitindo que o modelo acompanhe
+        # quais instâncias foram rotuladas e quais classes foram atribuídas
+        # a elas ao longo do tempo.
+
+        self.cl_memory = [[0] * np.unique(y[has_label]) for _ in range(len(X))]
+
+
         init_acc = self.train_new_classifier(has_label, X, y)
         old_selected = []
         self.n_iter_ = 0
@@ -74,15 +83,13 @@ class SelfFlexCon(BaseFlexConC):
             self.max_iter is None or self.n_iter_ <= self.max_iter
         ):
             self.n_iter_ += 1
-            self.base_estimator_.fit(
+            self.estimator_.fit(
                 X[safe_mask(X, has_label)], self.transduction_[has_label]
             )
-
-            # Predict on the unlabeled samples
-            prob = self.base_estimator_.predict_proba(
+            prob = self.estimator_.predict_proba(
                 X[safe_mask(X, ~has_label)]
             )
-            pred = self.base_estimator_.classes_[np.argmax(prob, axis=1)]
+            pred = self.estimator_.classes_[np.argmax(prob, axis=1)]
             max_proba = np.max(prob, axis=1)
 
             if self.n_iter_ > 1:
@@ -116,6 +123,7 @@ class SelfFlexCon(BaseFlexConC):
 
             # Add newly labeled confident predictions to the dataset
             has_label[selected_full] = True
+            self.add_new_labeled(selected_full, selected, pred)
             self.update_memory(np.nonzero(~has_label)[0], pred)
             # Predict on the labeled samples
             try:
@@ -127,11 +135,11 @@ class SelfFlexCon(BaseFlexConC):
                         self.transduction_[old_selected],
                         pred[selected]
                     ))
-                    self.base_estimator_select_.fit(X[selected_full], new_pred)
+                    self.estimator_select_.fit(X[selected_full], new_pred)
                     old_selected = []
                 else:
                     # Traning model to classify the labeled samples
-                    self.base_estimator_select_.fit(
+                    self.estimator_select_.fit(
                         X[selected_full],
                         pred[selected]
                     )
@@ -139,16 +147,7 @@ class SelfFlexCon(BaseFlexConC):
                 local_acc = self.calc_local_measure(
                     X[safe_mask(X, self.init_labeled_)],
                     y[self.init_labeled_],
-                    self.base_estimator_select_,
-                )
-
-                self.add_new_labeled(
-                    selected_full,
-                    selected,
-                    local_acc,
-                    init_acc,
-                    max_proba,
-                    pred
+                    self.estimator_select_,
                 )
                 self.new_threshold(local_acc, init_acc)
             except ValueError:
@@ -160,9 +159,9 @@ class SelfFlexCon(BaseFlexConC):
         if np.all(has_label):
             self.termination_condition_ = "all_labeled"
 
-        self.base_estimator_.fit(
+        self.estimator_.fit(
             X[safe_mask(X, has_label)], self.transduction_[has_label]
         )
-        self.classes_ = self.base_estimator_.classes_
+        self.classes_ = self.estimator_.classes_
 
         return self

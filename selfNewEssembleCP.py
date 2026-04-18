@@ -39,9 +39,10 @@ class MySelfNewEssembleCP:
         # Treinamento inicial
         self.classifier_.fit(X[labeled_mask], y[labeled_mask])
 
-        while not np.all(labeled_mask) and (self.max_iter is None or self.n_iter_ < self.max_iter):
+        while not np.all(labeled_mask) and self.n_iter_ < self.max_iter:
             self.n_iter_ += 1
 
+            # pega o vetor de rotulados e inverte para ter os não-rotulados
             unlabeled_mask = ~labeled_mask
             X_unlabeled = X[unlabeled_mask]
 
@@ -66,6 +67,12 @@ class MySelfNewEssembleCP:
             confident_indices = np.array([], dtype=int)
 
             if not np.any(confident_samples):
+                # Todas as instâncias não rotuladas que eu classifiquei não
+                # tiveram confiança acima do threshold,
+                # ou seja vetor [False] * n ?
+                # Então vamos calcular o índice Silhouette para cada instância
+                # e avaliar se as instâncias podem pertencer ao grupo
+                # (valor do índice < threshold do índice).
                 # Silhouette filtering e votação do comitê
                 X_labeled = X[labeled_mask]
                 y_labeled = self.transduction_[labeled_mask]
@@ -73,6 +80,9 @@ class MySelfNewEssembleCP:
                 weak_mask = silhouette_vals < self.silhouette_threshold
 
                 if np.any(weak_mask):
+                    # Se tiver alguma instância com o índice menor que o
+                    # threshold. Então, inicia-se o processo de reclassificação.
+
                     indices_labeled = np.where(labeled_mask)[0]
                     indices_weak = indices_labeled[weak_mask]
                     labeled_mask[indices_weak] = False
@@ -83,7 +93,27 @@ class MySelfNewEssembleCP:
 
                     X_weak = X[indices_weak]
                     prob_committee = self.committee.predict_proba(X_weak)
+                    documentation = """
+                    Predict on the unlabeled samples
+                    O método predict_proba é chamado para obter as probabilidades de cada classe para as instâncias não rotuladas, e essas probabilidades são usadas para determinar quais instâncias devem ser rotuladas com base no limiar definido.
 
+                    probs
+                    # ID   0    1    2
+                    # 3  0.33 0.33 0.34
+                    # 14 0.90 0.05 0.05
+                    # 80 0.80 0.13 0.07
+
+                    max_probs = [0.34, 0.96, 0.80]
+
+                    pred = [2, 0, 0]
+                    dict_first = {
+                        3: {'confidence': 0.34, 'classes': 2},
+                        14: {'confidence': 0.96, 'classes': 0},
+                        80: {'confidence': 0.80, 'classes': 0},
+                    }
+
+                    selected = [False, True, False]
+                    """
                     classes = self.classifier_.classes_
                     final_probs = prob_committee
                     new_labels = classes[np.argmax(final_probs, axis=1)]
