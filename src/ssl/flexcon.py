@@ -15,13 +15,13 @@ class BaseFlexConC(SelfTrainingClassifier):
 
     def __init__(
         self,
-        base_estimator,
+        estimator,
         cr: float = 0.05,
         threshold: float = 0.95,
         verbose: bool = False
     ):
         super().__init__(
-            base_estimator=base_estimator,
+            estimator=estimator,
             threshold=threshold,
             max_iter=100
         )
@@ -37,13 +37,13 @@ class BaseFlexConC(SelfTrainingClassifier):
         self.termination_condition_ = ""
         self.pred_x_it: dict = {}
         self.cl_memory: list = []
-        self.base_estimator_ = clone(self.base_estimator)
-        self.base_estimator_select_ = clone(self.base_estimator)
+        self.estimator_ = clone(self.estimator)
+        self.estimator_select_ = clone(self.estimator)
 
     def __str__(self) -> str:
         msg = super().__str__()
         msg += (
-            f"Classificador {self.base_estimator}\n"
+            f"Classificador {self.estimator}\n"
             f"Outros Parâmetro:"
             f" CR: {self.cr}\t Threshold: {self.threshold}"
             f" Máximo IT: {self.max_iter}"
@@ -62,10 +62,10 @@ class BaseFlexConC(SelfTrainingClassifier):
         generally done in meta-estimator or pipeline.
         """
         try:
-            if not hasattr(self.base_estimator, "predict_proba"):
-                msg = "base_estimator ({}) should implement predict_proba!"
+            if not hasattr(self.estimator, "predict_proba"):
+                msg = "estimator ({}) should implement predict_proba!"
                 raise ValueError(
-                    msg.format(type(self.base_estimator).__name__)
+                    msg.format(type(self.estimator).__name__)
                 )
         except ValueError:
             return False
@@ -101,10 +101,17 @@ class BaseFlexConC(SelfTrainingClassifier):
         """
         Responsável por calcular o novo limiar.
 
+        Fórmula:
+            $$
+            self.threshold = \frac{self.threshold + conf\_media + \frac{qtd\_instacias\_add}{total\_nao\_rolutado}}{3}
+            $$
+
         Args:
             - local_measure: valor da acurácia do modelo treinado.
             - init_acc: valor da acurácia inicial.
         """
+        # TODO: Implementar a fórmula, descrita nos args
+        # TODO: Reavaliação de rótulos no flexcon
 
         if local_measure > (init_acc + 0.01) and (
             (self.threshold - self.cr) > 0.0
@@ -124,6 +131,16 @@ class BaseFlexConC(SelfTrainingClassifier):
         """
         Atualiza a matriz de instâncias rotuladas.
 
+             A   B
+            0.2 0.8
+            0.7 0.3
+            0.6 0.4
+            0.51 0.49
+
+             A   B
+             0   1
+             1   0
+             1   0
         Args:
             - instances: instâncias.
             - labels: rotulos.
@@ -297,16 +314,16 @@ class BaseFlexConC(SelfTrainingClassifier):
         self.labeled_iter_[has_label] = 0
         self.init_labeled_ = has_label.copy()
 
-        base_estimator_init = clone(self.base_estimator)
+        estimator_init = clone(self.estimator)
         # L0 - MODELO TREINADO E CLASSIFICADO COM L0
-        base_estimator_init.fit(
+        estimator_init.fit(
             X[safe_mask(X, has_label)], self.transduction_[has_label]
         )
         # ACC EM L0 - RETORNA A EFICACIA DO MODELO
         init_acc = self.calc_local_measure(
             X[safe_mask(X, self.init_labeled_)],
             y[self.init_labeled_],
-            base_estimator_init,
+            estimator_init,
         )
 
         return init_acc
@@ -315,9 +332,6 @@ class BaseFlexConC(SelfTrainingClassifier):
         self,
         selected_full: list,
         selected: list,
-        local_acc: float,
-        init_acc: float,
-        max_proba: list[float],
         pred: list,
     ):
         """
@@ -327,23 +341,10 @@ class BaseFlexConC(SelfTrainingClassifier):
             - selected_full: lista com os indices das instâncias
                 originais.
             - selected: lista das intâncias com acc acima do limiar.
-            - local_acc: acurácia do modelo treinado com base na lista
-                selected.
-            - init_acc: acurácia do modelo treinado com base na lista
-                selected_full.
-            - max_proba: valores de probabilidade de predição das
-                intâncias não rotuladas.
             - pred: predição das instâncias não rotuladas.
         """
         self.transduction_[selected_full] = pred[selected]
         self.labeled_iter_[selected_full] = self.n_iter_
-
-        if selected_full.shape[0] > 0:
-            # no changed labels
-            self.new_threshold(local_acc, init_acc)
-            self.termination_condition_ = "threshold_change"
-        else:
-            self.threshold = np.max(max_proba)
 
         if self.verbose:
             print(
