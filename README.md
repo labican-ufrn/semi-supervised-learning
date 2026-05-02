@@ -140,11 +140,17 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
+```sh
+python -m venv .venv
+# Activate it (Windows)
+.venv\Scripts\activate
+```
+
 ### Install Dependencies
 
 Once activated, install the required development packages:
 ```sh
-pip install -r requirements-dev.txt
+pip install -e ".[dev]"
 ```
 
 ### Pre-commit Hooks
