@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 import numpy as np
 
-from mlabican.ensemble.ensemble import Ensemble
+from mlabican.ensemble import Ensemble
 
 
 class TestEnsemble(TestCase):
@@ -25,7 +25,9 @@ class TestEnsemble(TestCase):
         ensemble = Ensemble()
         self.assertListEqual(ensemble.ensemble, [])
 
-    def test_should_raise_exception_when_classifier_missing_methods(self) -> None:
+    def test_should_raise_exception_when_classifier_missing_methods(
+        self,
+    ) -> None:
         # A mock that lacks predict_proba
         invalid_classifier = MagicMock()
         del invalid_classifier.predict_proba

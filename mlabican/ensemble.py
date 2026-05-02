@@ -17,6 +17,7 @@ class Ensemble:
         AttributeError: If any provided classifier lacks the 'predict'
             or 'predict_proba' methods.
     """
+
     def __init__(
         self,
         classifiers: list | None = None,
@@ -37,8 +38,8 @@ class Ensemble:
             classifiers (list): A list of classifier objects to validate.
 
         Returns:
-            bool: True if all classifiers have 'predict' and 'predict_proba' methods,
-                False otherwise.
+            bool: True if all classifiers have 'predict' and
+                'predict_proba' methods, False otherwise.
         """
         return all(
             (has_method(c, 'predict') and has_method(c, 'predict_proba'))
@@ -62,7 +63,7 @@ class Ensemble:
 
     def fit_single_classifier(
         self,
-        classifier: object,
+        classifier,
         instances: np.ndarray,
         labels: np.ndarray,
     ) -> None:
@@ -70,7 +71,7 @@ class Ensemble:
         Trains a single classifier on the provided data.
 
         Args:
-            classifier (object): The classifier instance to train.
+            classifier: The classifier instance to train.
             instances (np.ndarray): The training data features.
             labels (np.ndarray): The target labels for training.
         """
@@ -78,14 +79,14 @@ class Ensemble:
 
     def predict_one_classifier(
         self,
-        classifier: object,
+        classifier,
         instances: np.ndarray,
     ) -> np.ndarray:
         """
         Returns the prediction of a specific classifier.
 
         Args:
-            classifier (object): The classifier to use for prediction.
+            classifier: The classifier to use for prediction.
             instances (np.ndarray): The data features to predict.
 
         Returns:
