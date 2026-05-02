@@ -1,5 +1,6 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+fail_fast: true
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
@@ -11,25 +12,38 @@ repos:
   - id: check-added-large-files
 - repo: local
   hooks:
-    - id: unit-tests
-      name: Unit tests
-      entry: python -m unittest
-      args: ['discover', 'tests']
-      language: system
-      pass_filenames: false
-      verbose: true
     - id: isort
-      name: Isort - formattion imports
+      name: Isort - format imports
       entry: isort
       language: python
       types: [python]
-    - id: formatter
-      name: ruff
-      entry: ruff format
-      language: system
-      types: [python]
+
     - id: lint
       name: ruff linter
       entry: ruff check
+      files: ^mlabican/
       language: system
+      types: [python]
+
+    - id: prettier
+      name: ruff format - pretty code
+      entry: ruff format
+      files: ^mlabican/
+      language: system
+      types: [python]
+
+    - id: unit-tests
+      name: Unit tests w/ coverage
+      entry: coverage run
+      language: system
+      pass_filenames: false
+      verbose: true
+      types: [python]
+
+    - id: coverage
+      name: Code coverage
+      entry: coverage report
+      language: system
+      pass_filenames: false
+      verbose: true
       types: [python]
