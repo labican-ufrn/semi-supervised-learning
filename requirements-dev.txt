@@ -1,7 +1,0 @@
-coverage==7.13.4
-ipdb==0.13.13
-isort==5.13.2
-pre_commit==4.0.1
-ruff==0.15.5
-
--r requirements.txt
