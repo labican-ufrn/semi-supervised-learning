@@ -46,11 +46,11 @@ class Ensemble:
             for c in classifiers
         )
 
-    def drop_ensemble(self) -> None:
+    def drop(self) -> None:
         """Clears all classifiers currently stored in the ensemble."""
         self.ensemble = []
 
-    def fit_ensemble(self, instances: np.ndarray, labels: np.ndarray) -> None:
+    def fit(self, instances: np.ndarray, labels: np.ndarray) -> None:
         """
         Trains all classifiers currently stored in the ensemble.
 
@@ -77,25 +77,6 @@ class Ensemble:
         """
         classifier.fit(instances, labels)
 
-    def predict_one_classifier(
-        self,
-        classifier,
-        instances: np.ndarray,
-    ) -> np.ndarray:
-        """
-        Returns the prediction of a specific classifier.
-
-        Args:
-            classifier: The classifier to use for prediction.
-            instances (np.ndarray): The data features to predict.
-
-        Returns:
-            np.ndarray: The array of predicted labels.
-        """
-        y_pred = classifier.predict(instances)
-
-        return y_pred
-
     def predict(self, instances: np.ndarray) -> np.ndarray:
         """
         Predicts the most common label (mode) among all classifiers for
@@ -118,5 +99,30 @@ class Ensemble:
                     classifier.predict(instance.reshape(1, -1)).tolist()[0]
                 )
             y_pred = np.append(y_pred, mode(pred))
+
+        return y_pred
+
+    def predict_proba(self, instances: np.ndarray) -> np.ndarray:
+        """
+        Predict class probabilities of the instances for all classifiers.
+
+        Args:
+            instances (np.ndarray): The data features to predict.
+
+        Returns:
+            np.ndarray: An array of the majority-voted predicted labels
+            for each instance.
+        """
+        y_pred = np.array([], dtype='float64')
+
+        for instance in instances:
+            probas = []
+
+            for classifier in self.ensemble:
+                probas.append(
+                    classifier.predict_proba(instance.reshape(1, -1)).tolist()
+                )
+            y_probas = np.average(probas, axis=0)
+            y_pred = np.append(y_pred, y_probas)
 
         return y_pred
