@@ -1,7 +1,4 @@
-from abc import (
-    ABC,
-    abstractmethod,
-)
+from abc import ABC, abstractmethod
 
 import numpy as np
 
@@ -12,8 +9,12 @@ class SelectionStrategy(ABC):
     @abstractmethod
     def select_instances(
         self, probabilities: np.ndarray, **kwargs
-    ) -> tuple[np.ndarray, list[int] | np.ndarray]:
-        """_summary_
+    ) -> np.ndarray:
+        """Method to select the instances based on some criteria,
+        such as:
+            - Amount of instances;
+            - Threshold;
+            - Threshold with rules;
 
         Args:
             probabilities (np.ndarray): probabilities of each label in
@@ -31,9 +32,6 @@ class SelectionStrategy(ABC):
             NotImplementedError: If you use superclass method.
 
         Returns:
-            tuple[np.ndarray, list[int] | np.ndarray]: A tuple with the
-            following items:
-                - Array of selected local indices.
-                - Array/List of predicted classes for those indices.
+            np.ndarray: An array of selected local indices.
         """
         raise NotImplementedError('implement me!')
