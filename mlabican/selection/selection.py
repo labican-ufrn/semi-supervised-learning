@@ -8,7 +8,7 @@ class SelectionStrategy(ABC):
 
     @abstractmethod
     def select_instances(
-        self, probabilities: np.ndarray, **kwargs
+        self, probabilities: np.ndarray, threshold: int | float, **kwargs
     ) -> np.ndarray:
         """Method to select the instances based on some criteria,
         such as:
@@ -19,6 +19,8 @@ class SelectionStrategy(ABC):
         Args:
             probabilities (np.ndarray): probabilities of each label in
                 the current iteration.
+            threshold (int | float): Number of instances or threshold to
+                select the unlabeled instances.
             kwargs (dict): A dictionary with parameters that can be used
                 in classes that inherit from this one. Options include:
                 # Thresholds

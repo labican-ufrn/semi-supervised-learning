@@ -4,16 +4,17 @@ from unittest.mock import MagicMock
 import numpy as np
 
 from mlabican.selection.selection import SelectionStrategy
+from mlabican.selection.threshold import Threshold
 from mlabican.selection.topN import TopN
 
 
 class StrategyNoImplementMock(SelectionStrategy, MagicMock):
-    def select_instances(self, probabilities, **kwargs):
-        super().select_instances(probabilities)
+    def select_instances(self, probabilities, threshold, **kwargs):
+        super().select_instances(probabilities, threshold)
 
 
 class StrategyImplementMock(SelectionStrategy, MagicMock):
-    def select_instances(self, probabilities, **kwargs):
+    def select_instances(self, probabilities, threshold, **kwargs):
         return True
 
 
@@ -30,7 +31,7 @@ class TestSelectionStrategy(TestCase):
             ]
         )
         self.predictions = np.array([1, 2, 0, 0, 1])
-        self.kwargs = {'threshold': 0.95}
+        self.kwargs = {}
 
     def test_should_raise_type_error_when_try_to_call_select_instances_in_superclass(
         self,
@@ -42,22 +43,27 @@ class TestSelectionStrategy(TestCase):
         self,
     ):  # NOQA
         with self.assertRaises(NotImplementedError) as err:
-            StrategyNoImplementMock().select_instances(np.array([]))
+            StrategyNoImplementMock().select_instances(np.array([]), 10)
 
     def test_should_initiate_when_try_to_call_select_instances(self):
-        self.assertTrue(StrategyImplementMock().select_instances(np.array([])))
+        self.assertTrue(
+            StrategyImplementMock().select_instances(np.array([]), 10)
+        )
 
     ###########################
     ##      TOP N Tests      ##
     ###########################
     def test_topN_with_invalid_n_instances(self):
         with self.assertRaises(ValueError):
-            TopN(n_instances=0)
+            strategy = TopN()
+            strategy.select_instances(
+                self.probabilities, 0, **self.kwargs
+            )
 
     def test_top_n_selection(self):
-        strategy = TopN(n_instances=2)
+        strategy = TopN()
         indices = strategy.select_instances(
-            self.probabilities, **self.kwargs
+            self.probabilities, 2, **self.kwargs
         )
 
         self.assertListEqual(indices.tolist(), [2, 0])
@@ -66,9 +72,9 @@ class TestSelectionStrategy(TestCase):
         self.assertEqual(len(indices), 2)
 
     def test_top_n_selection_more_than_available_instances(self):
-        strategy = TopN(n_instances=20)
+        strategy = TopN()
         indices = strategy.select_instances(
-            self.probabilities, **self.kwargs
+            self.probabilities, 20, **self.kwargs
         )
 
         self.assertListEqual(indices.tolist(), [2, 0, 4, 1, 3])
@@ -78,3 +84,18 @@ class TestSelectionStrategy(TestCase):
         )
 
         self.assertEqual(len(indices), 5)
+
+    ###########################
+    ##       Threshold       ##
+    ###########################
+    def test_simple_threshold_selection(self):
+        strategy = Threshold()
+
+        # Only instances with max_prob >= 0.75
+        indices = strategy.select_instances(
+            self.probabilities, .75, **self.kwargs
+        )
+
+        # Probs: 0.8 (idx 0), 0.9 (idx 2)
+        self.assertListEqual(indices.tolist(), [0, 2])
+        self.assertListEqual(self.predictions[indices].tolist(), [1, 0])
