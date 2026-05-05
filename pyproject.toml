@@ -124,7 +124,7 @@ quote-style = "single"
 indent-style = "space"
 
 # Like Black, respect magic trailing commas.
-skip-magic-trailing-comma = false
+skip-magic-trailing-comma = true
 
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
@@ -146,15 +146,13 @@ docstring-code-line-length = "dynamic"
 # ==========================================
 # ISORT CONFIGURATION
 # ==========================================
-[tool.isort]
-profile = "black"
-known_first_party = ["mlabican"]
-src_paths = ["src", "tests"]
-force_grid_wrap = 2
-multi_line_output = 3
-use_parentheses = true
-include_trailing_comma = true
-split_on_trailing_comma = true
+[tool.ruff.lint.isort]
+# profile = "black"
+known-first-party = ["mlabican"]
+case-sensitive = true
+combine-as-imports = false
+force-single-line = false
+split-on-trailing-comma = true
 
 # ==========================================
 # COVERAGE CONFIGURATION

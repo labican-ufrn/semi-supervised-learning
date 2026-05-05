@@ -12,12 +12,6 @@ repos:
   - id: check-added-large-files
 - repo: local
   hooks:
-    - id: isort
-      name: Isort - format imports
-      entry: isort
-      language: python
-      types: [python]
-
     - id: lint
       name: ruff linter
       entry: ruff check
@@ -41,7 +35,7 @@ repos:
       types: [python]
 
     - id: coverage
-      name: Code coverage
+      name: Coverage Report
       entry: coverage report
       language: system
       pass_filenames: false
