@@ -22,9 +22,9 @@ class TestEnsemble(TestCase):
         self.X = np.array([[5.1, 3.5]])
         self.y = np.array([1])
 
-    def test_create_ensemble_without_classifiers(self) -> None:
-        ensemble = Ensemble()
-        self.assertListEqual(ensemble.ensemble, [])
+    def test_should_raise_when_create_ensemble_without_classifiers(self) -> None:
+        with self.assertRaises(AttributeError):
+            Ensemble()
 
     def test_should_raise_exception_when_classifier_missing_methods(
         self,

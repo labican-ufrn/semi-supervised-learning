@@ -18,15 +18,13 @@ class Ensemble:
             or 'predict_proba' methods.
     """
 
-    def __init__(
-        self,
-        classifiers: list | None = None,
-    ) -> None:
-        if classifiers is not None:
-            if not self._validate_classifiers(classifiers):
-                raise AttributeError(
-                    'Any classifier does not have "predict" or "predict_proba" methods.'
-                )
+    def __init__(self, classifiers: list | None = None) -> None:
+        if classifiers is None or not self._validate_classifiers(classifiers):
+            msg = """
+                Any classifier does not have "predict" or "predict_proba"
+                methods.
+            """
+            raise AttributeError(msg)
         self.ensemble = classifiers or []
 
     def _validate_classifiers(self, classifiers: list) -> bool:
@@ -59,23 +57,7 @@ class Ensemble:
             labels (np.ndarray): The target labels for training.
         """
         for classifier in self.ensemble:
-            self.fit_single_classifier(classifier, instances, labels)
-
-    def fit_single_classifier(
-        self,
-        classifier,
-        instances: np.ndarray,
-        labels: np.ndarray,
-    ) -> None:
-        """
-        Trains a single classifier on the provided data.
-
-        Args:
-            classifier: The classifier instance to train.
-            instances (np.ndarray): The training data features.
-            labels (np.ndarray): The target labels for training.
-        """
-        classifier.fit(instances, labels)
+            classifier.fit(instances, labels)
 
     def predict(self, instances: np.ndarray) -> np.ndarray:
         """
