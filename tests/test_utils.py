@@ -19,11 +19,7 @@ class TestUtils(TestCase):
         np.random.RandomState(30)
         np.random.seed(42)
 
-        selected_instances = select_labels(
-            X_train,
-            y_train,
-            labelled_percentage,
-        )
+        selected_instances = select_labels(y_train, labelled_percentage)
         x_lbs, y_lbs = np.unique(selected_instances, return_counts=True)
 
         expected_output = [
@@ -44,17 +40,12 @@ class TestUtils(TestCase):
             1, 1, 1, 1, 1,
             1, 1, 1, 1, 1,
         ])
-        X_train = np.array([i for i in range(len(y_train))])
         labelled_percentage = .1
 
         np.random.RandomState(30)
         np.random.seed(42)
 
-        selected_instances = select_labels(
-            X_train,
-            y_train,
-            labelled_percentage,
-        )
+        selected_instances = select_labels(y_train, labelled_percentage)
         x_lbs, y_lbs = np.unique(selected_instances, return_counts=True)
 
         expected_output = [
@@ -75,17 +66,12 @@ class TestUtils(TestCase):
             1, 1, 1, 1, 1,
             2, 2, 2, 2, 2,
         ])
-        X_train = np.array([i for i in range(len(y_train))])
         labelled_percentage = .3
 
         np.random.RandomState(30)
         np.random.seed(42)
 
-        selected_instances = select_labels(
-            X_train,
-            y_train,
-            labelled_percentage,
-        )
+        selected_instances = select_labels(y_train, labelled_percentage)
         x_lbs, y_lbs = np.unique(selected_instances, return_counts=True)
 
         expected_output = [

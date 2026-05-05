@@ -18,9 +18,7 @@ def has_method(obj: object, method_name: str):
     return callable(attribute)
 
 
-def select_labels(
-    instances: np.ndarray, labels: np.ndarray, label_percentage: float
-) -> np.ndarray:
+def select_labels(labels: np.ndarray, label_percentage: float) -> np.ndarray:
     """
     Selects the instances that will be left without a label randomly
     based on the distribution of classes (stratified selection) and the
@@ -29,7 +27,6 @@ def select_labels(
     minority classes.
 
     Args:
-        instances (np.ndarray): Instances
         labels (np.ndarray): Labels
         labelled_percentage (float): % of instances that will have a
             label.
@@ -47,7 +44,7 @@ def select_labels(
             np.where(labels == lab)[0], int(cls_dist) or 1, replace=False
         ).tolist()
 
-    mask = np.ones(len(instances), bool)
+    mask = np.ones(len(labels), bool)
     mask[selected] = 0
     labels[mask] = -1
 
