@@ -1,6 +1,6 @@
 import numpy as np
 
-from mlabican.selection.selection import SelectionStrategy
+from mlabican.selection.base import SelectionStrategy
 
 
 class Threshold(SelectionStrategy):
