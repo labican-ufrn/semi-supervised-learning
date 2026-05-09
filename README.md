@@ -1,5 +1,7 @@
 # MLabican
 
+[toc]
+
 **MLabican** is the Machine Learning library used at Labican. It is developed in Python and designed to facilitate the use of semi-supervised learning algorithms — an highly effective approach when you have a massive amount of data, but only a small portion of it is labeled.
 
 The library implements a family of algorithms based on Self-Training. In this approach, the model itself can label unknown data based on its confidence. MLabican also provides advanced versions featuring pseudo-label revaluation, quality filters, and classifier ensembles (committees) for more robust decision-making.
@@ -28,10 +30,10 @@ TODO: Update this table
 
 | Python Class | Description |
 |:-------------|:------------|
-|SelfTrainingClassifier|Classic Self-Training: Iteratively adds confident labels to the training set as it learns.|
-|SelfWithRevaluation|Self-Training + Revaluation: Re-evaluates pseudo-labels using the silhouette index to ensure quality.|
-|SelfWithRevaluationEssemble|Ensemble Revaluation: Adds a committee of classifiers that vote on noisy instances to determine if they should be re-evaluated.|
-|SelfWithRevaluationEssembleWeights|Weighted Ensemble Revaluation: Similar to the standard Ensemble, but the voting classifiers have weights proportional to their initial accuracy on the dataset.|
+|SelfTrainingClassifier             | Classic Self-Training: Iteratively adds confident labels to the training set as it learns.|
+|SelfWithRevaluation                | Self-Training + Revaluation: Re-evaluates pseudo-labels using the silhouette index to ensure quality.|
+|SelfWithRevaluationEnsemble        | Ensemble Revaluation: Adds a committee of classifiers that vote on noisy instances to determine if they should be re-evaluated.|
+|SelfWithRevaluationEnsembleWeights | Weighted Ensemble Revaluation: Similar to the standard Ensemble, but the voting classifiers have weights proportional to their initial accuracy on the dataset.|
 
 ### Example
 1. Preparing the Data
@@ -111,11 +113,11 @@ clf.fit(X_train, y_train)
 | Parameter | Description |
 |:----------|:------------|
 | threshold | Minimum probability required to consider a pseudo-label as confident. |
-| k_best | A fixed number of the most confident examples to label per iteration (used if criterion="k_best"). |
+| k_best    | A fixed number of the most confident examples to label per iteration (used if criterion="k_best"). |
 | criterion | "threshold" or "k_best". Defines how examples are selected for labeling. |
-| max_iter | Maximum number of iterations the algorithm will run. |
+| max_iter  | Maximum number of iterations the algorithm will run. |
 | silhouette_threshold | Defines the minimum quality of the pseudo-labels (between 0 and 1). Used in versions with revaluation. |
-| verbose | If True, prints logs detailing the iterations and decisions. |
+| verbose   | If True, prints logs detailing the iterations and decisions. |
 
 ## Tips & Best Practices
 - Always use `np.nan` or `-1` (preferable) to mark unknown labels.
