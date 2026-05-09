@@ -172,12 +172,14 @@ class TestThresholdStrategy(TestCase):
 
         self.assertEqual(new_thr, old_thr)
 
-    def test_flexcon_strategy(self):
+    ###########################
+    ##        FLEXCON        ##
+    ###########################
+    def test_flexcon_strategy_should_update_thr(self):
         strategy = FlexConRatio()
 
         current_threshold = 0.9
 
-        # Test Case 1: Standard calculation
         new_thr = strategy.update_threshold(
             current_threshold,
             coverage=0.5,
@@ -185,7 +187,11 @@ class TestThresholdStrategy(TestCase):
         )
         self.assertAlmostEqual(new_thr, 0.7333333333333334) # (0.9 + 0.5 + 0.8) / 3
 
-        # Test Case 2: Zero division protection
+    def test_flexcon_should_stay_old_thr_when_average_prob_is_zero(self):
+        strategy = FlexConRatio()
+
+        current_threshold = 0.9
+
         new_thr = strategy.update_threshold(
             current_threshold,
             coverage=0.5,
@@ -193,10 +199,23 @@ class TestThresholdStrategy(TestCase):
         )
         self.assertEqual(new_thr, 0.90)
 
-        # Test Case 3: Ceiling bound (cannot exceed 1.0)
+    def test_flexcon_should_keep_the_thr_when_all_parameters_are_equal(self):
+        strategy = FlexConRatio()
+
+        current_threshold = 1.0
+
         new_thr = strategy.update_threshold(
-            1.0,
+            current_threshold,
             coverage=1.0,
             avg_predict_proba=1.0,
         )
         self.assertAlmostEqual(new_thr, 1.0)
+
+        current_threshold = .5
+
+        new_thr = strategy.update_threshold(
+            current_threshold,
+            coverage=.5,
+            avg_predict_proba=.5,
+        )
+        self.assertAlmostEqual(new_thr, .5)
