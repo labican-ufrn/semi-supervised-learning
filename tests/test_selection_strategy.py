@@ -109,7 +109,7 @@ class TestSelectionStrategy(TestCase):
     def test_rules_r1_with_threshold_selection(self):
         strategy = Rules()
 
-        self.kwargs = {'probs_1_it': np.array(
+        self.kwargs = {'prob_1_it': np.array(
             [
                 [0.4, 0.3, 0.3],
                 [0.3, 0.1, 0.6],
@@ -127,7 +127,7 @@ class TestSelectionStrategy(TestCase):
     def test_rules_r2_with_threshold_selection(self):
         strategy = Rules()
 
-        self.kwargs = {'probs_1_it': np.array(
+        self.kwargs = {'prob_1_it': np.array(
             [
                 [0.0, 0.8, 0.2],  # Selected by R2
                 [0.4, 0.3, 0.3],  #
@@ -145,7 +145,7 @@ class TestSelectionStrategy(TestCase):
     def test_rules_r3_with_threshold_selection(self):
         strategy = Rules()
 
-        self.kwargs = {'probs_1_it': np.array(
+        self.kwargs = {'prob_1_it': np.array(
             [
                 [0.4, 0.3, 0.3],  #
                 [0.3, 0.1, 0.6],  #
@@ -163,7 +163,7 @@ class TestSelectionStrategy(TestCase):
     def test_rules_r4_with_threshold_selection(self):
         strategy = Rules()
 
-        self.kwargs = {'probs_1_it': np.array(
+        self.kwargs = {'prob_1_it': np.array(
             [
                 [0.4, 0.3, 0.3],  # Selected by R4 by probs_x_it
                 [0.3, 0.1, 0.6],  #
@@ -181,7 +181,7 @@ class TestSelectionStrategy(TestCase):
     def test_rules_no_instance_should_be_selected_threshold_selection(self):
         strategy = Rules()
 
-        self.kwargs = {'probs_1_it': np.array(
+        self.kwargs = {'prob_1_it': np.array(
             [
                 [0.4, 0.3, 0.3],  # Selected by R4 by probs_x_it
                 [0.3, 0.1, 0.6],  #

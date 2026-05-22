@@ -3,10 +3,14 @@ import numpy as np
 from mlabican.label.base import LabelingStrategy
 
 
-class RuleBasedLabelingStrategy(LabelingStrategy):
+class RuleBasedLabelStrategy(LabelingStrategy):
     """
     FlexConC specific logic: Decides between Naive and Memory based on
     whether the predictions matched across iterations.
+
+    We just check the first instance, because the rules select the
+    instances based on this criteria. With this we can determine if we
+    use the current prediction or we must use the classification memory.
     """
 
     def label_instances(

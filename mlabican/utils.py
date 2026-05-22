@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 
 
@@ -49,3 +51,35 @@ def select_labels(labels: np.ndarray, label_percentage: float) -> np.ndarray:
     labels[mask] = -1
 
     return labels
+
+
+def get_logger(
+    name: str = 'FlexConLogger',
+    verbose: bool = False,
+    log_file: str = 'flexcon_training.log',
+) -> logging.Logger:
+    """
+    Configures and returns a centralized logger.
+    """
+    logger = logging.getLogger(name)
+
+    # Only configure if the logger doesn't have handlers already
+    if not logger.handlers:
+        logger.setLevel(logging.INFO if verbose else logging.WARNING)
+
+        # Formatter
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+
+        # Console Handler
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+
+        # Archive (File) Handler
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
+    return logger

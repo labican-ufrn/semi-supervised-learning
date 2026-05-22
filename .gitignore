@@ -6,6 +6,7 @@ __pycache__/
 .ruff_cache/
 build/
 dist/
+.coverage
 
 datasets_bck/
 datasets-all/

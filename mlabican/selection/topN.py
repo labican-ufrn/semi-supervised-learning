@@ -18,7 +18,7 @@ class TopN(SelectionStrategy):
 
     @override
     def select_instances(
-        self, probabilities: np.ndarray, threshold: int | float = 30, **kwargs
+        self, probabilities: np.ndarray, threshold: float = 30, **kwargs
     ) -> np.ndarray:
         threshold = int(threshold)
 

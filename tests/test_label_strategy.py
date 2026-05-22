@@ -6,7 +6,7 @@ from numpy.testing import assert_array_equal
 from mlabican.label.base import LabelingStrategy
 from mlabican.label.memory import MemoryStrategy
 from mlabican.label.naive import NaiveStrategy
-from mlabican.label.rules import RuleBasedLabelingStrategy
+from mlabican.label.rules import RuleBasedLabelStrategy
 
 
 class StrategyNoImplementMock(LabelingStrategy):
@@ -112,10 +112,10 @@ class TestLabelingStrategy(TestCase):
 
     def test_rule_based_strategy_mixed_conditions(self):
         """
-        Test that RuleBasedLabelingStrategy correctly toggles between Naive (when classes match)
+        Test that RuleBasedLabelStrategy correctly toggles between Naive (when classes match)
         and Memory (when classes diverge) logic.
         """
-        strategy = RuleBasedLabelingStrategy()
+        strategy = RuleBasedLabelStrategy()
         selected_indices = [2, 3]
 
         labels = strategy.label_instances(np.array(selected_indices), **self.kwargs)
@@ -131,10 +131,10 @@ class TestLabelingStrategy(TestCase):
 
     def test_rule_based_strategy_all_match(self):
         """
-        Test RuleBasedLabelingStrategy when all selected instances have matching predictions.
+        Test RuleBasedLabelStrategy when all selected instances have matching predictions.
         (Simulating instances selected strictly by Rules 1 or 2).
         """
-        strategy = RuleBasedLabelingStrategy()
+        strategy = RuleBasedLabelStrategy()
 
         # Force selection of indices 0 and 1 (both match in our setUp data)
         selected_match_indices = np.array([0, 1])
@@ -148,10 +148,10 @@ class TestLabelingStrategy(TestCase):
 
     def test_rule_based_strategy_all_differ(self):
         """
-        Test RuleBasedLabelingStrategy when all selected instances have differing predictions.
+        Test RuleBasedLabelStrategy when all selected instances have differing predictions.
         (Simulating instances selected strictly by Rules 3 or 4).
         """
-        strategy = RuleBasedLabelingStrategy()
+        strategy = RuleBasedLabelStrategy()
 
         # Force selection of indices 2 and 3 (both differ in our setUp data)
         selected_differ_indices = np.array([2, 3])

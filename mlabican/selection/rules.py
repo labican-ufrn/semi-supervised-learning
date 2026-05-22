@@ -29,12 +29,9 @@ class Rules(SelectionStrategy):
         ]
 
     def select_instances(
-        self,
-        probabilities: np.ndarray,
-        threshold: int | float = 0.95,
-        **kwargs,
+        self, probabilities: np.ndarray, threshold: float = 0.95, **kwargs
     ) -> np.ndarray:
-        probs_1_it = kwargs.get('probs_1_it', {})
+        probs_1_it = kwargs.get('prob_1_it', [])
         max_proba_1_it = np.max(probs_1_it, axis=1) >= threshold
         labels_1_it = np.argmax(probs_1_it, axis=1)
 
@@ -46,6 +43,13 @@ class Rules(SelectionStrategy):
                 labels_1_it, labels_x_it, max_proba_1_it, max_proba_x_it
             )
             if any(selected):
+                if self.verbose:
+                    msg = (
+                        f'Instances 1st > thr: {np.sum(max_proba_1_it)}'
+                        f'Instances Xst > thr: {np.sum(max_proba_x_it)}'
+                        f'Selected: {len(selected)}'
+                    )
+                    self.logger.info(msg)
                 return np.where(selected)[0]
 
         return np.array([])

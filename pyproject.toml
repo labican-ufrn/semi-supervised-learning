@@ -124,7 +124,7 @@ quote-style = "single"
 indent-style = "space"
 
 # Like Black, respect magic trailing commas.
-skip-magic-trailing-comma = true
+skip-magic-trailing-comma = false
 
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
@@ -153,6 +153,16 @@ case-sensitive = true
 combine-as-imports = false
 force-single-line = false
 split-on-trailing-comma = true
+
+# ==========================================
+# MYPY CONFIGURATION
+# ==========================================
+[[tool.mypy.overrides]]
+module = [
+    "sklearn.*",
+]
+ignore_missing_imports = true
+
 
 # ==========================================
 # COVERAGE CONFIGURATION

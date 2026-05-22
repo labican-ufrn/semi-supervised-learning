@@ -2,13 +2,19 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+from mlabican.utils import get_logger
+
 
 class SelectionStrategy(ABC):
     """Interface for instance selection strategies."""
 
+    def __init__(self, verbose: bool = False):
+        self.logger = get_logger()
+        self.verbose = verbose
+
     @abstractmethod
     def select_instances(
-        self, probabilities: np.ndarray, threshold: int | float, **kwargs
+        self, probabilities: np.ndarray, threshold: float, **kwargs
     ) -> np.ndarray:
         """Method to select the instances based on some criteria,
         such as:
@@ -19,15 +25,12 @@ class SelectionStrategy(ABC):
         Args:
             probabilities (np.ndarray): probabilities of each label in
                 the current iteration.
-            threshold (int | float): Number of instances or threshold to
+            threshold (float): Number of instances or threshold to
                 select the unlabeled instances.
             kwargs (dict): A dictionary with parameters that can be used
                 in classes that inherit from this one. Options include:
-                # Thresholds
-                - threshold (float): The threshold for the current iteration.
                 # Rules
                 - pred_1_it (dict): Prediction that was made in the first iteration.
-                - cl_memory (dict): Classification memory.
 
 
         Raises:
