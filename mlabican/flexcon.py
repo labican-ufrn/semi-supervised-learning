@@ -239,34 +239,6 @@ class FlexCon(SelfTrainingClassifier):
         y_pred = self.estimator_.predict(X)
         return accuracy_score(y_true, y_pred)
 
-    # def train_new_classifier(
-    #     self, X: np.ndarray, y: np.ndarray, has_label: np.ndarray
-    # ) -> float:
-    #     """
-    #     Treina o modelo inicial apenas com as instâncias rotuladas e retorna
-    #     a acurácia inicial.
-    #     """
-    #     self.transduction_ = np.copy(y)
-    #     self.labeled_iter_ = np.full_like(y, -1)
-    #     self.labeled_iter_[has_label] = 0
-    #     self.init_labeled_ = has_label.copy()
-
-    #     estimator_init = clone(self.estimator)
-
-    #     # L0 - Modelo treinado e classificado com L0
-    #     estimator_init.fit(
-    #         X[safe_mask(X, has_label)], self.transduction_[has_label]
-    #     )
-
-    #     # Acurácia em L0
-    #     init_acc = self.calc_local_measure(
-    #         X[safe_mask(X, self.init_labeled_)],
-    #         y[self.init_labeled_],
-    #         estimator_init,
-    #     )
-
-    #     return init_acc
-
     def update_memory(
         self,
         instances: np.ndarray,
