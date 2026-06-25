@@ -1,19 +1,30 @@
 # MLabican
 
-[toc]
-
-**MLabican** is the Machine Learning library used at Labican. It is developed in Python and designed to facilitate the use of semi-supervised learning algorithms — an highly effective approach when you have a massive amount of data, but only a small portion of it is labeled.
+**MLabican** is the Machine Learning library used at Labican. It is developed in Python and designed to facilitate the use of semi-supervised learning algorithms — a highly effective approach when you have a massive amount of data, but only a small portion of it is labeled.
 
 The library implements a family of algorithms based on Self-Training. In this approach, the model itself can label unknown data based on its confidence. MLabican also provides advanced versions featuring pseudo-label revaluation, quality filters, and classifier ensembles (committees) for more robust decision-making.
+
+[TOC]
+- [When to Use MLabican?](#when-to-use-mlabican)
+- [Installation](#installation)
+- [Available Algorithms](#available-algorithms)
+- [Important Parameters](#important-parameters)
+- [Tips & Best Practices](#tips--best-practices)
+- [Development & Contributing](#development--contributing)
+  - [Prerequisites](#prerequisites)
+  - [Virtual Environment Setup](#virtual-environment-setup)
+  - [Install Dependencies](#install-dependencies)
+  - [Pre-commit Hooks](#pre-commit-hooks)
+- [Licence](#licence)
+
+---
 
 ## When to Use MLabican?
 
 You should consider using mlabican when:
 
 - You have a large dataset, but labeling is expensive, time-consuming, or limited.
-
 - You want to maximize the potential of a partially labeled dataset.
-
 - You need robust models capable of filtering out and correcting inaccurate pseudo-labels.
 
 ## Installation
@@ -28,84 +39,53 @@ The library offers four main classes of algorithms:
 
 TODO: Update this table
 
-| Python Class | Description |
-|:-------------|:------------|
-|SelfTrainingClassifier             | Classic Self-Training: Iteratively adds confident labels to the training set as it learns.|
-|SelfWithRevaluation                | Self-Training + Revaluation: Re-evaluates pseudo-labels using the silhouette index to ensure quality.|
-|SelfWithRevaluationEnsemble        | Ensemble Revaluation: Adds a committee of classifiers that vote on noisy instances to determine if they should be re-evaluated.|
-|SelfWithRevaluationEnsembleWeights | Weighted Ensemble Revaluation: Similar to the standard Ensemble, but the voting classifiers have weights proportional to their initial accuracy on the dataset.|
+| Python Class / Interface | Category | Description |
+|:-------------------------|:---------|:------------|
+| FlexCon / SelfFlexCon    | Core     | A flexible self-training implementation that delegates instance selection, labeling, thresholding, and health monitoring to injected strategies. |
+| Ensemble                 | Core     | Wrapper class containing multiple FlexCon classifiers to manage ensemble weighting and predictions. |
+| LabelingStrategy         | Strategy | Interface defining how new instances receive labels (Implementations: `MemoryStrategy`, `NaiveStrategy`, `RuleBasedLabelStrategy`). |
+| SelectionStrategy        | Strategy | Determines which pseudo-labeled instances should be kept. The Rules implementation specifically handles complex selection by applying multi-rule filtering logic for NumPy arrays based on specific probability thresholds. |
+| ThresholdStrategy        | Strategy | Interface for dynamically updating the confidence threshold over iterations (Implementations: `Classifier`, `FlexConRatio`, `Gradual`). |
+| ModelHealthMonitor       | Strategy | Monitors model health across iterations to prevent degradation, tracking metric shifts (Implementations: `PredictionDriftMonitor`, `StabilityMonitor`). |
+| RevaluationStrategy      | Strategy | Reassesses the quality of pseudo-labels, utilizing specific metrics to drop or keep instances (Implementations: `Immediate`, `Deferred`). |
+| DifficultMetrics         | Utility  | Defines mathematical calculations to score instance difficulty or cluster quality (Implementations: `Silhouette`, `DaviesBouldin`). |
 
 ### Example
 1. Preparing the Data
 
-MLabican algorithms work with a partially labeled target array (`y`). To indicate unlabeled data, you must use `np.nan` or `-1` (preferred) in your labels.
+MLabican algorithms work with a partially labeled target array (y). To indicate unlabeled data, you must use -1 for your unknown labels.
 
 ```python
 import numpy as np
+from sklearn import datasets
+from sklearn.semi_supervised import SelfTrainingClassifier
+from sklearn.gaussian_process import GaussianProcessClassifier as Naive
 
-y_train = y_train.astype(float)
-rng = np.random.default_rng(42)
+from mlabican.flexcon import FlexCon
+rng = np.random.RandomState(42)
+iris = datasets.load_iris()
+random_unlabeled_points = rng.rand(iris.target.shape[0]) < 0.3
+iris.target[random_unlabeled_points] = -1
 
-# Mask 30 random instances as unlabeled data
-y_train[rng.choice(len(y_train), size=30, replace=False)] = -1  # or = np.nan
-```
-
-2. Quick Start: SelfTrainingClassifier
-
-```python
-import numpy as np
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from mlabican.selfTraining import SelfTrainingClassifier
-
-# Load data
-X, y = load_iris(return_X_y=True)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-
-# Make a portion of the data unlabeled
-y_train = y_train.astype(float)
-y_train[:20] = np.nan
-
-# Define the base model
-base_model = DecisionTreeClassifier()
-
-# Initialize and fit the Self-training classifier
-clf = SelfTrainingClassifier(estimator=base_model, threshold=0.9)
-clf.fit(X_train, y_train)
-
-# Predict
-y_pred = clf.predict(X_test)
-```
-
-3. Advanced Version: Revaluation & Ensemble
-
-You can use more sophisticated models that feature reclassification by a committee. This is particularly useful when your data contains noise.
-
-```python
-from mlabican.selfTraining import SelfWithRevaluationEssemble
-from sklearn.ensemble import VotingClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-
-# Define a committee of classifiers
-committee = VotingClassifier([
-    ("dt", DecisionTreeClassifier()),
-    ("nb", GaussianNB()),
-    ("svc", SVC(probability=True))
-])
-
-# Initialize the advanced self-training model
-clf = SelfWithRevaluationEssemble(
-    estimator=DecisionTreeClassifier(),
-    committee=committee,
-    threshold=0.9,
-    max_iter=10,
-    verbose=True
+flexcon = FlexCon(
+    estimator=Naive(),
+    cr=0.05,
+    # Dependency Injection for Strategies
+    # if all none, it's FlexCon-C default version
+    threshold_strategy=None,  # Classifier()
+    selection_strategy=None,  # Rules()
+    labeling_strategy=None,   # RuleBasedLabelStrategy()
+    # Other parameters
+    threshold=0.95,
+    max_iter=100,
+    verbose=True  # Generate a log file with result for each iteration
 )
 
-clf.fit(X_train, y_train)
+
+flexcon.fit(iris.data, iris.target)
+
+print('Finish test')
+
 ```
 
 
@@ -113,17 +93,15 @@ clf.fit(X_train, y_train)
 | Parameter | Description |
 |:----------|:------------|
 | threshold | Minimum probability required to consider a pseudo-label as confident. |
-| k_best    | A fixed number of the most confident examples to label per iteration (used if criterion="k_best"). |
-| criterion | "threshold" or "k_best". Defines how examples are selected for labeling. |
+| cr        | change rate, it changes the threshold based on this value. |
 | max_iter  | Maximum number of iterations the algorithm will run. |
-| silhouette_threshold | Defines the minimum quality of the pseudo-labels (between 0 and 1). Used in versions with revaluation. |
 | verbose   | If True, prints logs detailing the iterations and decisions. |
+| others    | Check each Strategy classes to make custom configurations. |
 
 ## Tips & Best Practices
-- Always use `np.nan` or `-1` (preferable) to mark unknown labels.
+- Always use `-1` to mark unknown labels.
 - The `estimator` passed to the models must implement the `.predict_proba()` method.
 - Use `verbose=True` while experimenting to better understand the algorithm's behavior.
-- The Ensemble (Committee) versions generally yield better results when dealing with noisy datasets.
 
 ## Development & Contributing
 
@@ -163,9 +141,7 @@ After installing the requirements, you need to configure the `pre-commit` hooks.
 pre-commit install --install-hooks
 ```
 
-Finish, when you try to commit now the pre-commit hooks will analyse your files
-and will fix some minor problems to improve and standardize the code based on the
-patters defined in the `.pyproject` file.
+Once finished, when you try to commit, the pre-commit hooks will analyze your files and will fix some minor problems to improve and standardize the code based on the patterns defined in the `.pyproject` file.
 
 ## Licence
 
