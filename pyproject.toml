@@ -1,6 +1,181 @@
-[tool.black]
-line-length = 79
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
 
-[tool.isort]
-multi_line_output = 3
-profile = "black"
+# ==========================================
+# PACKAGE CONFIGURATION
+# ==========================================
+[tool.setuptools.packages.find]
+# Explicitly excludes other common root folders
+exclude = ["stuff*", "docs*", "examples*"]
+
+[project]
+name = "mlabican"
+version = "1.1.4"
+description = "Semi-supervised learning algorithms with several strategies to improve the performance and/or effectiveness of the pseudo labeling step in Self-training algorithm."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+keywords = ["mlabican"]
+dependencies = [
+    "matplotlib==3.10.0",
+    "numpy==2.1.3",
+    "pandas==2.2.3",
+    "scikit-learn>=1.6.1",
+    "scipy==1.14.1",
+]
+authors = [
+    { name="Arthur Gorgonio", email="gorgonioarthur@gmail.com" },
+    { name="Luiz Miguel Santos Silva", email="luiz.santos.090@ufrn.edu.br" },
+    { name="Renan Costa" },
+    { name="Karliane Vale", email="karliane.vale@ufrn.br" },
+    { name="Flavius Gorgonio", email="flavius.gorgonio@ufrn.br" },
+]
+maintainers = [
+    { name="Arthur Gorgonio", email="gorgonioarthur@gmail.com" },
+]
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 2 - Pre-Alpha",
+
+  # Indicate who your project is intended for
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries",
+
+  # Specify the Python versions you support here.
+  "Programming Language :: Python :: 3.12",
+]
+
+
+[project.urls]
+Homepage="https://pypi.org/project/mlabican/"
+Repository = "https://github.com/labican-ufrn/semi-supervised-learning"
+Issues = "https://github.com/labican-ufrn/semi-supervised-learning/issues"
+
+[project.optional-dependencies]
+dev = [
+    "coverage",
+    "ipdb",
+    "isort",
+    "pre_commit",
+    "ruff",
+]
+
+# ==========================================
+# RUFF CONFIGURATION
+# ==========================================
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "__pycache__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+line-length = 79
+indent-width = 4
+
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "single"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+# ==========================================
+# ISORT CONFIGURATION
+# ==========================================
+[tool.ruff.lint.isort]
+# profile = "black"
+known-first-party = ["mlabican"]
+case-sensitive = true
+combine-as-imports = false
+force-single-line = false
+split-on-trailing-comma = true
+
+# ==========================================
+# MYPY CONFIGURATION
+# ==========================================
+[[tool.mypy.overrides]]
+module = [
+    "sklearn.*",
+]
+ignore_missing_imports = true
+
+
+# ==========================================
+# COVERAGE CONFIGURATION
+# ==========================================
+[tool.coverage.report]
+fail_under = 80
+precision = 2
+skip_empty = true
+show_missing = true
+sort = "cover"
+format = "text"
+
+[tool.coverage.run]
+branch = true
+include = ["mlabican/*"]
+command_line = "-m unittest discover -s tests/"
