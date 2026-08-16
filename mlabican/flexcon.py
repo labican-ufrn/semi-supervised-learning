@@ -227,12 +227,14 @@ class FlexCon(SelfTrainingClassifier):
                 #     '''
                 # )
 
-        self.classes_ = self.estimator_.classes_
+        self.estimator_.fit(X[has_label], self.transduction_[has_label])
         self.termination_condition_ = (
             'Max iterations'
             if self.n_iter_ == self.max_iter
             else 'Label all instances'
         )
+
+        return self
 
     def calc_local_measure(self, X: np.ndarray, y_true: np.ndarray) -> float:
         """Calcula a eficácia de classificação de um modelo nas instâncias locais."""
