@@ -51,7 +51,7 @@ classDiagram
     FlexCon o-- RevaluationStrategy : uses
     FlexCon o-- SelectionStrategy : uses
     FlexCon o-- ThresholdStrategy : uses
-    SelfFlexCon --|> FlexCon : inherits
+    sklearn.semi_supervised.SelfTrainingClassifier --|> FlexCon : inherits
 
     Ensemble o-- FlexCon : contains
 ```
