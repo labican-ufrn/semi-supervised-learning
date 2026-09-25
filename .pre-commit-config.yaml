@@ -1,8 +1,9 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+fail_fast: true
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: trailing-whitespace
   - id: end-of-file-fixer
@@ -11,20 +12,32 @@ repos:
   - id: check-added-large-files
 - repo: local
   hooks:
+    - id: lint
+      name: ruff linter
+      entry: ruff check
+      files: ^mlabican/
+      language: system
+      types: [python]
+
+    - id: prettier
+      name: ruff format - pretty code
+      entry: ruff format
+      files: ^mlabican/
+      language: system
+      types: [python]
+
     - id: unit-tests
-      name: Unit tests
-      entry: python -m unittest
-      args: ['discover', 'tests']
+      name: Unit tests w/ coverage
+      entry: coverage run
       language: system
       pass_filenames: false
       verbose: true
-    - id: isort
-      name: Isort
-      entry: isort
-      language: python
       types: [python]
-    - id: lint
-      name: PyLint
-      entry: pylint
+
+    - id: coverage
+      name: Coverage Report
+      entry: coverage report
       language: system
+      pass_filenames: false
+      verbose: true
       types: [python]
