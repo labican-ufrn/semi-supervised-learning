@@ -22,3 +22,7 @@ path_for_results/
 *.dat
 *.png
 *.csv
+*.log
+
+# Local experiment scripts (not part of the library)
+run_exp.py

@@ -6,11 +6,13 @@ from sklearn.semi_supervised import SelfTrainingClassifier
 
 from mlabican.label.base import LabelingStrategy
 from mlabican.label.rules import RuleBasedLabelStrategy
+from mlabican.revaluation.base import RevaluationStrategy
 from mlabican.selection.base import SelectionStrategy
 from mlabican.selection.rules import Rules
 from mlabican.threshold.base import ThresholdStrategy
 from mlabican.threshold.classifier import Classifier
 from mlabican.utils import get_logger
+
 
 
 class FlexCon(SelfTrainingClassifier):
@@ -34,6 +36,8 @@ class FlexCon(SelfTrainingClassifier):
             Estratégia para seleção de instâncias (Default: RuleBasedSelectionStrategy).
         labeling_strategy : LabelingStrategy, optional
             Estratégia para definir o rótulo da instância selecionada (Default: RuleBasedLabelingStrategy).
+        revaluation_strategy : RevaluationStrategy, optional
+            Estratégia para reavaliação de pseudo-rótulos (Default: None).
         cr : float, optional
             Taxa de mudança do limiar `threshold`, por default 0.05.
         threshold : float, optional
@@ -48,6 +52,7 @@ class FlexCon(SelfTrainingClassifier):
         threshold_strategy: ThresholdStrategy | None = None,
         selection_strategy: SelectionStrategy | None = None,
         labeling_strategy: LabelingStrategy | None = None,
+        revaluation_strategy: RevaluationStrategy | None = None,
         cr: float = 0.05,
         threshold: float = 0.95,
         max_iter: int = 100,
@@ -83,6 +88,7 @@ class FlexCon(SelfTrainingClassifier):
         self.selection_strategy = selection_strategy or Rules()
         self.labeling_strategy = labeling_strategy or RuleBasedLabelStrategy()
         self.threshold_strategy = threshold_strategy or Classifier()
+        self.revaluation_strategy: RevaluationStrategy | None = revaluation_strategy
 
     def __str__(self) -> str:
         return (
@@ -148,13 +154,17 @@ class FlexCon(SelfTrainingClassifier):
                         X[self.labeled_iter_ == 0], y[self.labeled_iter_ == 0]
                     )
                 }
-                print(f'init_label: {threshold_kwargs["init_measure"]}')
+                if self.verbose:
+                    print(f'init_label: {threshold_kwargs["init_measure"]}')
                 self.pred_1_it = self.storage_predict(
                     unlabeled_indices.tolist(),
                     np.max(prob, axis=1).tolist(),
                     pred.tolist(),
                 )
-                prob_1_it = prob.copy()
+                full_prob_1_it = np.zeros((len(X), prob.shape[1]))
+                full_prob_1_it[unlabeled_indices] = prob
+
+            prob_1_it = full_prob_1_it[unlabeled_indices]
 
             strategy_kwargs = {
                 'predictions': pred,
@@ -175,6 +185,23 @@ class FlexCon(SelfTrainingClassifier):
             )
 
             if selected_local.size == 0:
+                # Attempt revaluation before falling back to threshold reduction
+                if self.revaluation_strategy is not None:
+                    new_labels, new_mask = self.revaluation_strategy.revaluate(
+                        X,
+                        self.transduction_,
+                        has_label,
+                        labeled_iter=self.labeled_iter_,
+                        estimator=self.estimator_,
+                    )
+                    if not np.array_equal(new_mask, has_label):
+                        self.transduction_ = new_labels
+                        has_label = new_mask
+                        self.estimator_.fit(
+                            X[has_label], self.transduction_[has_label]
+                        )
+                        continue
+
                 reduce_times += 1
                 self.threshold = float(np.trunc(np.max(prob) * 10**2) / 10**2)
                 self.logger.info(
@@ -210,7 +237,6 @@ class FlexCon(SelfTrainingClassifier):
             self.threshold = self.threshold_strategy.update_threshold(
                 self.threshold, self.cr, **threshold_kwargs
             )
-            prob_1_it = np.delete(prob_1_it, selected_local, axis=0)
 
             if self.verbose:
                 self._log_iteration_stats(
