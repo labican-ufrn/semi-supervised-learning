@@ -160,7 +160,10 @@ class FlexCon(SelfTrainingClassifier):
                     np.max(prob, axis=1).tolist(),
                     pred.tolist(),
                 )
-                prob_1_it = prob.copy()
+                full_prob_1_it = np.zeros((len(X), prob.shape[1]))
+                full_prob_1_it[unlabeled_indices] = prob
+
+            prob_1_it = full_prob_1_it[unlabeled_indices]
 
             strategy_kwargs = {
                 'predictions': pred,
@@ -233,7 +236,6 @@ class FlexCon(SelfTrainingClassifier):
             self.threshold = self.threshold_strategy.update_threshold(
                 self.threshold, self.cr, **threshold_kwargs
             )
-            prob_1_it = np.delete(prob_1_it, selected_local, axis=0)
 
             if self.verbose:
                 self._log_iteration_stats(
