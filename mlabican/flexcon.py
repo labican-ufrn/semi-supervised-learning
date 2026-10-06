@@ -154,7 +154,8 @@ class FlexCon(SelfTrainingClassifier):
                         X[self.labeled_iter_ == 0], y[self.labeled_iter_ == 0]
                     )
                 }
-                print(f'init_label: {threshold_kwargs["init_measure"]}')
+                if self.verbose:
+                    print(f'init_label: {threshold_kwargs["init_measure"]}')
                 self.pred_1_it = self.storage_predict(
                     unlabeled_indices.tolist(),
                     np.max(prob, axis=1).tolist(),
