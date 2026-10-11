@@ -58,6 +58,7 @@ Issues = "https://github.com/labican-ufrn/semi-supervised-learning/issues"
 
 [project.optional-dependencies]
 dev = [
+    "behave",
     "coverage",
     "ipdb",
     "isort",
@@ -178,4 +179,4 @@ format = "text"
 [tool.coverage.run]
 branch = true
 include = ["mlabican/*"]
-command_line = "-m unittest discover -s tests/"
+command_line = "-m unittest discover -s tests/unit/"
