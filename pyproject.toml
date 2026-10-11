@@ -58,6 +58,7 @@ Issues = "https://github.com/labican-ufrn/semi-supervised-learning/issues"
 
 [project.optional-dependencies]
 dev = [
+    "behave",
     "coverage",
     "ipdb",
     "isort",
