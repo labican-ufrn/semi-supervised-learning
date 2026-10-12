@@ -180,3 +180,29 @@ format = "text"
 branch = true
 include = ["mlabican/*"]
 command_line = "-m unittest discover -s tests/unit/"
+
+
+# ==========================================
+# BEHAVE CONFIGURATION
+# ==========================================
+[tool.behave]
+log_capture = true
+stderr_capture = true
+stdout_capture = true
+
+stop = false
+summary = true
+show_timings = true
+show_skipped = true
+
+lang = "pt"
+paths = ["tests/integration"]
+
+# Define default tags to run or skip (e.g., skip slow tests by default)
+# default_tags = ~@slow
+
+# Specify formatters (e.g., plain, pretty, progress)
+format = ["progress"]
+
+[tool.behave.userdata]
+BEHAVE_DEBUG_ON_ERROR = false
