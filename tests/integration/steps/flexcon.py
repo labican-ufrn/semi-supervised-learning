@@ -28,7 +28,7 @@ def compute_metric(metric_name, y_true, y_pred, y_prob):
 
 
 
-@given('que o algoritmo "{algorithm}" está instanciado com o classificador "{model}"')
+@given('que o algoritmo "{algorithm}" foi instanciado com o classificador "{model}"')
 def create_algorithm(context, algorithm, model):
     context.flexcon = FlexCon(
         estimator=Naive(),
@@ -36,14 +36,14 @@ def create_algorithm(context, algorithm, model):
     )
 
 
-@given('que a base de dados "{dataset}" possui {ssl_rate} porcento dos dados não rotulados')
-def create_ssl_dataset(context, ssl_rate, dataset):
+@given('que a base de dados "{dataset}" possuía {ssl_rate:n} por cento dos dados não rotulados')
+def create_ssl_dataset(context, dataset, ssl_rate):
     rng = np.random.RandomState(42)
     iris = datasets.load_iris()
     y_true = iris.target.copy()
+    print(f'Val {ssl_rate} - {type(ssl_rate)}')
 
-# percentual de instâncias que serão não-rotuladas
-    random_unlabeled_points = rng.rand(iris.target.shape[0]) < 0.3
+    random_unlabeled_points = rng.rand(iris.target.shape[0]) < ssl_rate / 100
     iris.target[random_unlabeled_points] = -1
 
     context.dataset = iris
