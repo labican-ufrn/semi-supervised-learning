@@ -1,8 +1,8 @@
 Funcionalidade: FlexCon
 
   Cenário: Algoritmo FlexCon-C classificando base com sucesso (#42)
-    Dado que o algoritmo "FlexCon-C" está instanciado com o classificador "naive"
-    E que a base de dados "iris" possui "30" porcento dos dados não rotulados
+    Dado que o algoritmo "FlexCon-C" foi instanciado com o classificador "naive"
+    E que a base de dados "iris" possuía 30 por cento dos dados não rotulados
     Quando o algoritmo treinar
     Então a performance da métrica deverá ser igual a:
       | metric     | value  |
