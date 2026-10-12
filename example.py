@@ -14,7 +14,7 @@ iris = datasets.load_iris()
 y_true = iris.target.copy()
 
 # percentual de instâncias que serão não-rotuladas
-random_unlabeled_points = rng.rand(iris.target.shape[0]) < 0.2
+random_unlabeled_points = rng.rand(iris.target.shape[0]) < 0.3
 
 iris.target[random_unlabeled_points] = -1
 
@@ -32,5 +32,6 @@ y_prob = flexcon.predict_proba(iris.data)
 print(f' Acc: {accuracy_score(y_true, y_pred)}')
 print(f'  F1: {f1_score(y_true, y_pred, average="macro")}')
 print(f' Auc: {roc_auc_score(y_true, y_prob, multi_class="ovr")}')
+print(f' Iter: {flexcon.n_iter_}')
 
 print('Finish test')
