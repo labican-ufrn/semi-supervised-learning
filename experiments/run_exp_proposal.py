@@ -1,8 +1,8 @@
 """
-run_exp.py
+run_exp_proposal.py
 
-Semi-supervised benchmark runner using a custom SelfTraining (self_train.py)
-with Silhouette-based pseudo-label revaluation.
+Semi-supervised benchmark runner using SelfTraining (self_train_proposal.py)
+with Silhouette-based pseudo-label revaluation (DeferredRevaluationStrategy).
 
 Features:
   - Loop order strictly follows experimental design:
@@ -11,6 +11,8 @@ Features:
               for fold in StratifiedKFold:
   - Interactive tqdm progress bar with live metrics, ETA, and speed
   - Full support for both Binary and Multi-class datasets
+  - Robust specialist selection: Adaptive KNN (n_neighbors) and cross-validation 
+    fallbacks designed for small or class-imbalanced datasets (e.g., PlanningRelax).
   - Independent output files per dataset:
       * results/<dataset>.csv
   - Instant disk flushing after every single fold (zero data loss on interruption)
@@ -38,13 +40,13 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.tree import DecisionTreeClassifier
-# from tqdm import tqdm
+from tqdm import tqdm
 
 # Library imports
 from mlabican.revaluation.metrics import SilhouetteMetric
 from mlabican.revaluation.strategies import DeferredRevaluationStrategy
 from mlabican.utils import select_labels
-from mlabican.self_train import SelfTraining
+from mlabican.self_train_proposal import SelfTraining
 
 # Optional XGBoost support
 try:
@@ -78,8 +80,6 @@ CLASSIFIERS: dict[str, Any] = {
 if HAS_XGBOOST:
     CLASSIFIERS["XGBoost"] = XGBClassifier
 
-DEBUG_TEST = 1  # 0 = desligado | 1, 2, 3 ou 4 = qual conferência imprimir
-
 def _dist(y):
     vals, counts = np.unique(y, return_counts=True)
     return dict(zip(vals.tolist(), counts.tolist()))
@@ -88,7 +88,6 @@ def _dist(y):
 # Helper Functions
 # ==============================================================
 
-# XX teste XX
 def fit_predict(X_train, y_semi, X_test, best_name, best_cls):
     # A estratégia é injetada: o SelfTraining não conhece a Silhouette,
     # só recebe um objeto com .revaluate(...)
@@ -102,7 +101,7 @@ def fit_predict(X_train, y_semi, X_test, best_name, best_cls):
         revaluation_strategy=reval,
         threshold=THRESHOLD,
         max_iter=MAX_ITER,
-        verbose=5 #{1: 1, 4: 2}.get(DEBUG_TEST, 0),
+        verbose=1,  # 0 = silencioso | 1 = exibe resumo do progresso do Self-Training
     )
     model.fit(X_train, y_semi)  # só X_train e y_semi (com -1)
     return model, model.predict(X_test), model.predict_proba(X_test)
@@ -124,27 +123,49 @@ def select_specialist(
 ) -> tuple[str, Any]:
     """
     Avalia os classificadores candidatos usando APENAS as instâncias rotuladas
-    do treino (Split 2) via validação cruzada interna.
+    do treino via validação cruzada interna. Robusto contra baixos volumes de dados.
     """
     scores: dict[str, float] = {}
 
     n_samples = len(y_labeled)
     n_classes = len(np.unique(y_labeled))
-    cv_splits = max(2, min(3, n_samples // n_classes)) if n_classes > 0 else 2
+
+    # Se houver menos de 2 amostras por classe ou amostragem insuficiente de 2 classes, cai para Decision Tree como fallback
+    if n_samples < 2 or n_classes < 2:
+        return "Decision Tree", DecisionTreeClassifier
+
+    # Ajusta cv_splits dinamicamente com base na menor classe disponível
+    class_counts = np.bincount(y_labeled) if np.issubdtype(y_labeled.dtype, np.integer) else pd.Series(y_labeled).value_counts().values
+    min_class_samples = class_counts.min() if len(class_counts) > 0 else 1
+
+    cv_splits = max(2, min(3, min_class_samples))
 
     for name, cls in CLASSIFIERS.items():
         try:
-            model = instantiate_classifier(name, cls)
+            # Instanciação adaptativa para o KNN não estourar n_neighbors
+            if name == "KNN":
+                k_adj = max(1, min(5, n_samples - 1))
+                model = cls(n_neighbors=k_adj)
+            else:
+                model = instantiate_classifier(name, cls)
+            
             cv_scores = cross_val_score(model, X_labeled, y_labeled, cv=cv_splits, scoring="accuracy")
-            scores[name] = float(np.mean(cv_scores))
+
+            # Filtra retornos numéricos inválidos (nan/inf)
+            valid_scores = [s for s in cv_scores if not np.isnan(s)]
+            if valid_scores:
+                scores[name] = float(np.mean(valid_scores))
+
         except Exception:
             continue
 
+    # Fallback seguro caso a validação cruzada falhe para todos os modelos
     if not scores:
         return "Decision Tree", DecisionTreeClassifier
 
     max_acc = max(scores.values())
     candidates = [name for name, acc in scores.items() if acc == max_acc]
+
     best_name = choice(candidates)
     return best_name, CLASSIFIERS[best_name]
 
@@ -197,14 +218,14 @@ def evaluate_dataset(
     target_csv = OUTPUT_DIR / f"{dataset_name}.csv"
     total_folds_dataset = len(percentages) * len(seeds) * n_folds
 
-    # pbar = tqdm(
-    #     total=total_folds_dataset,
-    #     desc=f"[{dataset_idx}/{total_datasets}] {dataset_name} ({dataset_type})",
-    #     unit="fold",
-    #     dynamic_ncols=True,
-    #     leave=True,
-    #     file=sys.stdout,
-    # )
+    pbar = tqdm(
+        total=total_folds_dataset,
+        desc=f"[{dataset_idx}/{total_datasets}] {dataset_name} ({dataset_type})",
+        unit="fold",
+        dynamic_ncols=True,
+        leave=True,
+        file=sys.stdout,
+    )
 
     for pct in percentages:
         for seed in seeds:
@@ -245,7 +266,7 @@ def evaluate_dataset(
                     y_semi[labeled_indices],
                 )
                 # if DEBUG_TEST == 1:
-                #     tqdm.write(f"[T1] select_specialist usou {len(labeled_indices)} rotulados do treino e {n_test} instâncias do TESTE para escolher '{best_name}'")
+                #     tqdm.write(f"[T1] select_specialist usou {len(labeled_indices)} rotulados do treino '{best_name}'")
 
                 first_write = not target_csv.exists()
                 t0 = time.time()
@@ -295,11 +316,11 @@ def evaluate_dataset(
                         "error": None,
                     }
                 except Exception as e:
-                    # tqdm.write(
-                    #     f"[{dataset_name}] pct={pct:.0%} seed={seed} "
-                    #     f"fold={fold}/{n_folds} [ERROR]: {e}",
-                    #     file=sys.stdout,
-                    # )
+                    tqdm.write(
+                        f"[{dataset_name}] pct={pct:.0%} seed={seed} "
+                        f"fold={fold}/{n_folds} [ERROR]: {e}",
+                        file=sys.stdout,
+                    )
                     row = {
                         **base_row,
                         "acc": None,
@@ -320,10 +341,10 @@ def evaluate_dataset(
                 }
                 if last_acc is not None:
                     postfix["acc"] = f"{last_acc:.4f}"
-                # pbar.set_postfix(postfix)
-                # pbar.update(1)
+                pbar.set_postfix(postfix)
+                pbar.update(1)
 
-    # pbar.close()
+    pbar.close()
 
 
 # ==============================================================
@@ -352,7 +373,7 @@ def list_datasets() -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Self-Training semi-supervised benchmark with Silhouette revaluation."
+        description="Self-Training semi-supervised benchmark (Proposta - Classificador Único) com reavaliação por Silhueta."
     )
     parser.add_argument(
         "--datasets", nargs="*", metavar="NAME",
@@ -389,7 +410,7 @@ def main():
     OUTPUT_DIR.mkdir(exist_ok=True)
 
     print("\n" + "="*65)
-    print("  SELF-TRAINING SEMI-SUPERVISED BENCHMARK")
+    print(" BENCHMARK: Self-Training (Proposta - Classificador Único) ")
     print("="*65)
     print(f"Loop order        : pct -> seed -> fold (StratifiedKFold)")
     print(f"Folds             : {args.folds} folds")
@@ -412,7 +433,7 @@ def main():
         X = df.iloc[:, :-1].values
         y = normalize_labels(df.iloc[:, -1].values)
 
-        # ds_start = time.time()
+        ds_start = time.time()
         evaluate_dataset(
             dataset_name=path.stem,
             X=X,
@@ -423,10 +444,10 @@ def main():
             dataset_idx=i,
             total_datasets=len(targets),
         )
-        # tqdm.write(
-        #    f">>> Finished {path.stem} in {time.time() - ds_start:.1f}s\n",
-        #    file=sys.stdout,
-        # )
+        tqdm.write(
+            f">>> Finished {path.stem} in {time.time() - ds_start:.1f}s\n",
+            file=sys.stdout,
+        )
 
     print("="*65)
     print(f"ALL DATASETS COMPLETED IN {time.time() - total_start:.1f}s")
