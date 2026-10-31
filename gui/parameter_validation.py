@@ -24,9 +24,9 @@ def validate_parameters(labeled_percentage, threshold, cr, classifiers):
     if not all (math.isfinite(value) for value in [LabeledPercentage, Threshold, CR]): raise ValueError("Digite apenas números finitos.") 
 
 
-    if not (0 <= LabeledPercentage <= 100): raise ValueError ("Ovalor de rotulagem deve estar entre 0 e 100.")
+    if not (0 <= LabeledPercentage <= 100): raise ValueError ("O valor de rotulagem deve estar entre 0 e 100.")
     if not (0 <= Threshold <= 1): raise ValueError ("O Threshold deve estar entre 0 e 1.")
-    if not (0 <= CR <= 1): raise ValueError ("O CR deve ser maior ou igual a 0 e menor que 1.")
+    if not (0 <= CR <= 1): raise ValueError ("O valor de CR deve estar entre 0 e 1.")
     if not classifiers: raise ValueError ("Selecione pelo menos um classificador.")
     invalid_classifiers = set(classifiers) - SUPPORTED_CLASSIFIERS
     if invalid_classifiers: raise ValueError (f"Classificadores inválidos: {', '.join(invalid_classifiers)}. Classificadores suportados: {', '.join(SUPPORTED_CLASSIFIERS)}.")
