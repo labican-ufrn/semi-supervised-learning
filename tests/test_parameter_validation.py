@@ -132,3 +132,35 @@ def test_boundary_values():
     assert result["labeled_percentage"] == 100.0
     assert result["threshold"] == 1.0
     assert result["cr"] == 1.0
+
+# Teste 11: aceitar números com até 6 casas decimais.
+def test_valid_decimal_precision():
+    result = validate_parameters(
+        labeled_percentage="50.123456",
+        threshold="0.123456",
+        cr="0.123456",
+        classifiers=["KNN"],
+    )
+
+    assert result["labeled_percentage"] == 50.123456
+    assert result["threshold"] == 0.123456
+    assert result["cr"] == 0.123456
+
+
+# Teste 12: rejeitar números com mais de 6 casas decimais.
+@pytest.mark.parametrize(
+    "field",
+    ["labeled_percentage", "threshold", "cr"],
+)
+def test_invalid_decimal_precision(field):
+    parameters = {
+        "labeled_percentage": "50",
+        "threshold": "0.5",
+        "cr": "0.05",
+        "classifiers": ["KNN"],
+    }
+
+    parameters[field] = "0.1234567"
+
+    with pytest.raises(ValueError, match="não pode ultrapassar 6 casas decimais"):
+        validate_parameters(**parameters)
