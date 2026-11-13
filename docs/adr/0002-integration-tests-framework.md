@@ -1,15 +1,15 @@
-# ADR 001: Escolha de Framework BDD para Testes de Integração de ML
+# ADR 0002: Escolha de Framework BDD para Testes de Integração de ML
 
 ## Status
 **Proposto**
 
 ## Contexto
 
-O MLabican é uma biblioteca de aprendizado de máquina semissupervisionado baseada em algoritmos de *Self-Training*, comitês de classificadores e filtros de qualidade.  Atualmente, nossa suíte de testes unitários é construída utilizando a biblioteca nativa do Python, o `unittest`, pois evita utilizar dependências externas e simplifica a criação de testes. Com o avanço do desenvolvimento dos nossos modelos de Machine Learning (ML), identificamos a necessidade de implementar testes de integração baseados em Comportamento (BDD - Behavior-Driven Development).
+O MLabican é uma biblioteca de aprendizado de máquina semissupervisionado baseada em algoritmos de *Self-Training*, comitês de classificadores e filtros de qualidade. Atualmente, nossa suíte de testes unitários é construída utilizando a biblioteca nativa do Python, o `unittest`, pois evita utilizar dependências externas e simplifica a criação de testes. Com o avanço do desenvolvimento dos nossos modelos de Machine Learning (ML), identificamos a necessidade de implementar testes de integração baseados em Comportamento (BDD - Behavior-Driven Development).
 
 O objetivo é validar pipelines de dados, inferências de modelos e integrações com bases vetoriais ou APIs externas usando linguagem natural, que é acessível para stakeholders de negócio e cientistas de dados (Gherkin).
 
-Precisamos expandir nossa estratégia para testes de integração usando BDD.  Objetivando em validar o comportamento macro dos algoritmos (ex: fluxo completo de auto-treinamento, reavaliação de pseudo-rótulos e convergência do comitê com dados não rotulados) usando especificações em formato Gherkin (Dado/Quando/Então).
+Precisamos expandir nossa estratégia para testes de integração usando BDD. Objetivando em validar o comportamento macro dos algoritmos (ex: fluxo completo de auto-treinamento, reavaliação de pseudo-rótulos e convergência do comitê com dados não rotulados) usando especificações em formato Gherkin (Dado/Quando/Então).
 
 ## Alternativas Consideradas
 Nesta ADR serão comparados as bibliotecas `pytest-bdd` e `behave`.
