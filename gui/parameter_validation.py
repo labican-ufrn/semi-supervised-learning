@@ -22,7 +22,7 @@ def validate_parameters(labeled_percentage, threshold, cr, classifiers):
     if cr is None or str(cr).strip() == "":
         raise ValueError("O CR não pode ser vazio.")
 
-    # NOVO: aceitar números com até 6 casas decimais
+    # aceitar números com até 6 casas decimais
     number_pattern = r"[+-]?\d+(\.\d{1,6})?"
 
     fields = {
@@ -34,7 +34,7 @@ def validate_parameters(labeled_percentage, threshold, cr, classifiers):
     for field, value in fields.items():
         value = str(value).strip()  # NOVO: armazenar o valor sem espaços
 
-        # NOVO: verificar se ultrapassou 6 casas decimais
+        # verificar se ultrapassou 6 casas decimais
         if re.search(r"\.\d{7,}", value):
             raise ValueError(
                 f"{field} não pode ultrapassar 6 casas decimais."
