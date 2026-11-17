@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from gui.parameter_validation import validate_parameters
-
+from mlabican.gui.parameter_validation import validate_parameters
 
 class TestParameterValidation(TestCase):
 
