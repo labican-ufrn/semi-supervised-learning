@@ -1,5 +1,8 @@
 import customtkinter as ctk
-from .parameter_validation import validate_parameters
+
+from parameter_validation import validate_parameters
+from theme import ThemeColor
+
 
 class ParameterForm(ctk.CTk):
 
@@ -13,14 +16,14 @@ class ParameterForm(ctk.CTk):
         self.geometry("650x650")
         self.minsize(650, 650)
         self.resizable(True, True)
-        self.configure(fg_color="#121820")
+        self.configure(fg_color=ThemeColor.BACKGROUND.value)
 
         # Painel principal
         self.frame = ctk.CTkFrame(
             self,
             width=520,
             corner_radius=15,
-            fg_color="#1E293B"
+            fg_color=ThemeColor.SURFACE.value
         )
         self.frame.pack(pady=10, padx=40, fill="both", expand=True)
 
@@ -29,7 +32,7 @@ class ParameterForm(ctk.CTk):
             self.frame,
             text="Configuração do Experimento",
             font=("Arial", 23, "bold"),
-            text_color="#60A5FA"
+            text_color=ThemeColor.TITLE.value
         )
         self.title_label.pack(pady=(15, 3))
 
@@ -37,7 +40,7 @@ class ParameterForm(ctk.CTk):
             self.frame,
             text="Defina os parâmetros do algoritmo",
             font=("Arial", 13),
-            text_color="#94A3B8"
+            text_color=ThemeColor.SUBTITLE.value
         )
         self.subtitle_label.pack(pady=(0, 10))
 
@@ -46,7 +49,7 @@ class ParameterForm(ctk.CTk):
             self.frame,
             text="Percentual de Dados Rotulados (0-100)",
             font=("Arial", 13, "bold"),
-            text_color="#E2E8F0"
+            text_color=ThemeColor.TEXT.value
         )
         self.label_percentage.pack(anchor="w", padx=65, pady=(2, 2))
 
@@ -55,16 +58,16 @@ class ParameterForm(ctk.CTk):
             placeholder_text="Ex: 50",
             width=390,
             height=38,
-            fg_color="#273548",
-            border_color="#334155",
-            text_color="#E2E8F0"
+            fg_color=ThemeColor.INPUT.value,
+            border_color=ThemeColor.BORDER.value,
+            text_color=ThemeColor.TEXT.value
         )
         self.entry_percentage.pack(pady=(0, 5), anchor="w", padx=65)
 
         self.percentage_error_label = ctk.CTkLabel(
             self.frame,
             text="",
-            text_color="#F87171",
+            text_color=ThemeColor.DANGER.value,
             font=("Arial", 11)
         )
         self.percentage_error_label.pack(anchor="w", padx=65, pady=(0, 2))
@@ -74,7 +77,7 @@ class ParameterForm(ctk.CTk):
             self.frame,
             text="Threshold (0-1)",
             font=("Arial", 13, "bold"),
-            text_color="#E2E8F0"
+            text_color=ThemeColor.TEXT.value
         )
         self.label_threshold.pack(anchor="w", padx=65, pady=2)
 
@@ -83,16 +86,16 @@ class ParameterForm(ctk.CTk):
             placeholder_text="Ex: 0.5",
             width=390,
             height=38,
-            fg_color="#273548",
-            border_color="#334155",
-            text_color="#E2E8F0"
+            fg_color=ThemeColor.INPUT.value,
+            border_color=ThemeColor.BORDER.value,
+            text_color=ThemeColor.TEXT.value
         )
         self.entry_threshold.pack(pady=(0, 5), anchor="w", padx=65)
 
         self.threshold_error_label = ctk.CTkLabel(
             self.frame,
             text="",
-            text_color="#F87171",
+            text_color=ThemeColor.DANGER.value,
             font=("Arial", 11)
         )
         self.threshold_error_label.pack(anchor="w", padx=65, pady=(0, 2))
@@ -102,7 +105,7 @@ class ParameterForm(ctk.CTk):
             self.frame,
             text="CR (0-1)",
             font=("Arial", 13, "bold"),
-            text_color="#E2E8F0"
+            text_color=ThemeColor.TEXT.value
         )
         self.label_cr.pack(anchor="w", padx=65, pady=2)
 
@@ -111,16 +114,16 @@ class ParameterForm(ctk.CTk):
             placeholder_text="Ex: 0.5",
             width=390,
             height=38,
-            fg_color="#273548",
-            border_color="#334155",
-            text_color="#E2E8F0"
+            fg_color=ThemeColor.INPUT.value,
+            border_color=ThemeColor.BORDER.value,
+            text_color=ThemeColor.TEXT.value
         )
         self.entry_cr.pack(pady=(0, 5), anchor="w", padx=65)
 
         self.cr_error_label = ctk.CTkLabel(
             self.frame,
             text="",
-            text_color="#F87171",
+            text_color=ThemeColor.DANGER.value,
             font=("Arial", 11)
         )
         self.cr_error_label.pack(anchor="w", padx=65, pady=(0, 2))
@@ -130,7 +133,7 @@ class ParameterForm(ctk.CTk):
             self.frame,
             text="Selecione os classificadores",
             font=("Arial", 15, "bold"),
-            text_color="#60A5FA"
+            text_color=ThemeColor.TITLE.value
         )
         self.label_classifiers.pack(anchor="w", padx=65, pady=(3, 5))
 
@@ -162,9 +165,9 @@ class ParameterForm(ctk.CTk):
                 font=("Arial", 12),
                 checkbox_width=20,
                 checkbox_height=20,
-                fg_color="#2563EB",
-                hover_color="#3B82F6",
-                text_color="#E2E8F0"
+                fg_color=ThemeColor.PRIMARY.value,
+                hover_color=ThemeColor.PRIMARY_HOVER.value,
+                text_color=ThemeColor.TEXT.value
             )
 
             row = index // 2
@@ -183,7 +186,7 @@ class ParameterForm(ctk.CTk):
         self.classifiers_error_label = ctk.CTkLabel(
             self.frame,
             text="",
-            text_color="#F87171",
+            text_color=ThemeColor.DANGER.value,
             font=("Arial", 11)
         )
         self.classifiers_error_label.pack(anchor="w", padx=65, pady=(0, 2))
@@ -194,8 +197,8 @@ class ParameterForm(ctk.CTk):
             text="Confirmar parâmetros",
             width=390,
             height=40,
-            fg_color="#2563EB",
-            hover_color="#3B82F6",
+            fg_color=ThemeColor.PRIMARY.value,
+            hover_color=ThemeColor.PRIMARY_HOVER.value,
             command=self.collect_parameters
         )
         self.button_confirm.pack(pady=(10, 5))
@@ -204,7 +207,7 @@ class ParameterForm(ctk.CTk):
         self.status_label = ctk.CTkLabel(
             self.frame,
             text="",
-            text_color="#E2E8F0",
+            text_color=ThemeColor.TEXT.value,
             font=("Arial", 14, "bold")
         )
         self.status_label.pack(pady=5)
@@ -237,7 +240,7 @@ class ParameterForm(ctk.CTk):
 
             self.status_label.configure(
                 text="Parâmetros validados com sucesso!",
-                text_color="#4ADE80"
+                text_color=ThemeColor.SUCCESS.value
             )
 
             print(self.parameters)
@@ -259,5 +262,5 @@ class ParameterForm(ctk.CTk):
 
 
 if __name__ == "__main__":
-     app = ParameterForm() 
-     app.mainloop()
+    app = ParameterForm()
+    app.mainloop()
