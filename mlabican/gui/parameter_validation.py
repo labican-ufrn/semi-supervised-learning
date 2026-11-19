@@ -2,82 +2,94 @@ import math
 import re
 
 SUPPORTED_CLASSIFIERS = {
-    "KNN",
-    "Naive Bayes",
-    "Decision Tree",
-    "Random Forest",
-    "Logistic Regression",
-    "Neural Network",
+"KNN",
+"Naive Bayes",
+"Decision Tree",
+"Random Forest",
+"Logistic Regression",
+"Neural Network",
 }
-
 
 def validate_parameters(labeled_percentage, threshold, cr, classifiers):
 
-    if labeled_percentage is None or str(labeled_percentage).strip() == "":
-        raise ValueError("O Percentual de dados rotulados não pode ser vazio.")
-
-    if threshold is None or str(threshold).strip() == "":
-        raise ValueError("O Threshold não pode ser vazio.")
-
-    if cr is None or str(cr).strip() == "":
-        raise ValueError("O CR não pode ser vazio.")
-
-    # aceitar números com até 6 casas decimais
-    number_pattern = r"[+-]?\d+(\.\d{1,6})?"
+    errors = {}
 
     fields = {
-        "Percentual de dados rotulados": labeled_percentage,
-        "Threshold": threshold,
-        "CR": cr
+        "labeled_percentage": ("Percentual de dados rotulados", labeled_percentage),
+        "threshold": ("Threshold", threshold),
+        "cr": ("CR", cr)
     }
 
-    for field, value in fields.items():
-        value = str(value).strip()  # NOVO: armazenar o valor sem espaços
+    number_pattern = r"[+-]?\d+(\.\d{1,6})?"
 
-        # verificar se ultrapassou 6 casas decimais
+    numeric_values = {}
+
+    for key, (field_name, value) in fields.items():
+        value = str(value).strip()
+
+        if not value:
+            errors[key] = f"{field_name} não pode ser vazio."
+            continue
+
         if re.search(r"\.\d{7,}", value):
-            raise ValueError(
-                f"{field} não pode ultrapassar 6 casas decimais."
+            errors[key] = f"{field_name} não pode ultrapassar 6 casas decimais."
+            continue
+
+        if not re.fullmatch(number_pattern, value):
+            errors[key] = f"Digite apenas números no {field_name}."
+            continue
+
+        try:
+            numeric_value = float(value)
+
+        except (ValueError, TypeError):
+            errors[key] = f"Digite apenas números no {field_name}."
+            continue
+
+        if not math.isfinite(numeric_value):
+            errors[key] = f"{field_name} deve ser um número finito."
+            continue
+
+        numeric_values[key] = numeric_value
+
+    if "labeled_percentage" in numeric_values:
+        value = numeric_values["labeled_percentage"]
+
+        if not (0 <= value <= 100):
+            errors["labeled_percentage"] = (
+                "O valor de rotulagem deve estar entre 0 e 100."
             )
 
-        # Verificar o formato do número
-        if not re.fullmatch(number_pattern, value):
-            raise ValueError(f"Digite apenas números no {field}.")
+    if "threshold" in numeric_values:
+        value = numeric_values["threshold"]
 
-    try:
-        LabeledPercentage = float(labeled_percentage)
-        Threshold = float(threshold)
-        CR = float(cr)
+        if not (0 <= value <= 1):
+            errors["threshold"] = "O Threshold deve estar entre 0 e 1."
 
-    except (ValueError, TypeError):
-        raise ValueError("Digite apenas números.")
+    if "cr" in numeric_values:
+        value = numeric_values["cr"]
 
-    if not all(math.isfinite(value) for value in [LabeledPercentage, Threshold, CR]):
-        raise ValueError("Digite apenas números finitos.")
-
-    if not (0 <= LabeledPercentage <= 100):
-        raise ValueError("O valor de rotulagem deve estar entre 0 e 100.")
-
-    if not (0 <= Threshold <= 1):
-        raise ValueError("O Threshold deve estar entre 0 e 1.")
-
-    if not (0 <= CR <= 1):
-        raise ValueError("O valor de CR deve estar entre 0 e 1.")
+        if not (0 <= value <= 1):
+            errors["cr"] = "O valor de CR deve estar entre 0 e 1."
 
     if not classifiers:
-        raise ValueError("Selecione pelo menos um classificador.")
+        errors["classifiers"] = "Selecione pelo menos um classificador."
 
     invalid_classifiers = set(classifiers) - SUPPORTED_CLASSIFIERS
 
     if invalid_classifiers:
-        raise ValueError(
-            f"Classificadores inválidos: {', '.join(invalid_classifiers)}. "
-            f"Classificadores suportados: {', '.join(SUPPORTED_CLASSIFIERS)}."
+        errors["classifiers"] = (
+            f"Classificadores inválidos: {', '.join(invalid_classifiers)}."
         )
 
+    if errors:
+        return {"errors": errors}
+
     return {
-        "labeled_percentage": LabeledPercentage,
-        "threshold": Threshold,
-        "cr": CR,
+        "parameters": {
+        "labeled_percentage": numeric_values["labeled_percentage"],
+        "threshold": numeric_values["threshold"],
+        "cr": numeric_values["cr"],
         "classifiers": list(classifiers),
+    }
     }

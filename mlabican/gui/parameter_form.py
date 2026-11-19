@@ -230,36 +230,43 @@ class ParameterForm(ctk.CTk):
         self.classifiers_error_label.configure(text="")
         self.status_label.configure(text="")
 
-        try:
-            self.parameters = validate_parameters(
-                labeled_percentage,
-                threshold,
-                cr,
-                selected_classifiers
+        result = validate_parameters(
+            labeled_percentage,
+            threshold,
+            cr,
+            selected_classifiers
+        )
+
+        #se houver algum erro exibe todos
+        if "errors" in result:
+            errors = result["errors"]
+
+            self.percentage_error_label.configure(
+                text=errors.get("labeled_percentage", "")
+            )
+            
+            self.threshold_error_label.configure(
+                text=errors.get("threshold", "")
+            )
+            
+            self.cr_error_label.configure(
+                text=errors.get("cr", "")
+            )
+            
+            self.classifiers_error_label.configure(
+                text=errors.get("classifiers", "")
             )
 
-            self.status_label.configure(
-                text="Parâmetros validados com sucesso!",
-                text_color=ThemeColor.SUCCESS.value
-            )
+            return
+        #se não houver erros
+        self.parameters = result["parameters"]
 
-            print(self.parameters)
+        self.status_label.configure(
+        text="Parâmetros validados com sucesso!",
+        text_color=ThemeColor.SUCCESS.value
+    )
 
-        except ValueError as error:
-            message = str(error)
-
-            if "Percentual de dados rotulados" in message or "rotulagem" in message:
-                self.percentage_error_label.configure(text=message)
-
-            elif "Threshold" in message:
-                self.threshold_error_label.configure(text=message)
-
-            elif "CR" in message:
-                self.cr_error_label.configure(text=message)
-
-            elif "classificador" in message.lower():
-                self.classifiers_error_label.configure(text=message)
-
+        print(self.parameters)
 
 if __name__ == "__main__":
     app = ParameterForm()
