@@ -154,15 +154,6 @@ combine-as-imports = false
 force-single-line = false
 split-on-trailing-comma = true
 
-# ==========================================
-# MYPY CONFIGURATION
-# ==========================================
-[[tool.mypy.overrides]]
-module = [
-    "sklearn.*",
-]
-ignore_missing_imports = true
-
 
 # ==========================================
 # COVERAGE CONFIGURATION
@@ -177,5 +168,4 @@ format = "text"
 
 [tool.coverage.run]
 branch = true
-include = ["mlabican/*"]
-command_line = "-m unittest discover -s tests/"
+source = ["mlabican"]

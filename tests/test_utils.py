@@ -13,7 +13,6 @@ class TestUtils(TestCase):
             1, 1, 1, 1, 1,
             1, 1, 1, 1, 1,
         ])
-        X_train = np.array([i for i in range(len(y_train))])
         labelled_percentage = .3
 
         np.random.RandomState(30)

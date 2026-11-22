@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 from mlabican.threshold.base import ThresholdStrategy
-
 from mlabican.threshold.classifier import Classifier
 from mlabican.threshold.flexcon import FlexConRatio
 from mlabican.threshold.gradual import Gradual
@@ -24,13 +23,13 @@ class TestThresholdStrategy(TestCase):
     def test_should_raise_type_error_when_try_create_threshold_object_without_implement_abstract_methods(
         self,
     ):  # NOQA
-        with self.assertRaises(TypeError) as err:
+        with self.assertRaises(TypeError):
             ThresholdStrategy()
 
     def test_should_raise_not_implemented_when_try_to_call_update_threshold_in_superclass(
         self,
     ):  # NOQA
-        with self.assertRaises(NotImplementedError) as err:
+        with self.assertRaises(NotImplementedError):
             StrategyNoImplementMock().update_threshold(.95, .5)
 
     def test_should_initiate_when_try_to_call_select_instances(self):
