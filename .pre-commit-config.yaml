@@ -27,7 +27,7 @@ repos:
 
     - id: unit-tests
       name: Unit tests w/ coverage
-      entry: bash -c "coverage erase && coverage run -m unittest discover -s tests/unit/ && coverage report"
+      entry: bash -c "coverage erase && coverage run -m unittest discover tests/unit/ && coverage report"
       language: system
       pass_filenames: false
       always_run: true
