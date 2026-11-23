@@ -1,19 +1,18 @@
 import customtkinter as ctk
 
-from parameter_validation import validate_parameters
-from theme import ThemeColor
+from mlabican.gui.parameter_validation import validate_parameters
+from mlabican.gui.theme import ThemeColor
 
 
 class ParameterForm(ctk.CTk):
-
     def __init__(self):
         super().__init__()
 
         # Configuração da janela
-        ctk.set_appearance_mode("dark")
+        ctk.set_appearance_mode('dark')
 
-        self.title("FlexCon - Configuração de Experimento")
-        self.geometry("650x650")
+        self.title('FlexCon - Configuração de Experimento')
+        self.geometry('650x650')
         self.minsize(650, 650)
         self.resizable(True, True)
         self.configure(fg_color=ThemeColor.BACKGROUND.value)
@@ -23,137 +22,136 @@ class ParameterForm(ctk.CTk):
             self,
             width=520,
             corner_radius=15,
-            fg_color=ThemeColor.SURFACE.value
+            fg_color=ThemeColor.SURFACE.value,
         )
-        self.frame.pack(pady=10, padx=40, fill="both", expand=True)
+        self.frame.pack(pady=10, padx=40, fill='both', expand=True)
 
         # Título
         self.title_label = ctk.CTkLabel(
             self.frame,
-            text="Configuração do Experimento",
-            font=("Arial", 23, "bold"),
-            text_color=ThemeColor.TITLE.value
+            text='Configuração do Experimento',
+            font=('Arial', 23, 'bold'),
+            text_color=ThemeColor.TITLE.value,
         )
         self.title_label.pack(pady=(15, 3))
 
         self.subtitle_label = ctk.CTkLabel(
             self.frame,
-            text="Defina os parâmetros do algoritmo",
-            font=("Arial", 13),
-            text_color=ThemeColor.SUBTITLE.value
+            text='Defina os parâmetros do algoritmo',
+            font=('Arial', 13),
+            text_color=ThemeColor.SUBTITLE.value,
         )
         self.subtitle_label.pack(pady=(0, 10))
 
         # Percentual de dados rotulados
         self.label_percentage = ctk.CTkLabel(
             self.frame,
-            text="Percentual de Dados Rotulados (0-100)",
-            font=("Arial", 13, "bold"),
-            text_color=ThemeColor.TEXT.value
+            text='Percentual de Dados Rotulados (0-100)',
+            font=('Arial', 13, 'bold'),
+            text_color=ThemeColor.TEXT.value,
         )
-        self.label_percentage.pack(anchor="w", padx=65, pady=(2, 2))
+        self.label_percentage.pack(anchor='w', padx=65, pady=(2, 2))
 
         self.entry_percentage = ctk.CTkEntry(
             self.frame,
-            placeholder_text="Ex: 50",
+            placeholder_text='Ex: 50',
             width=390,
             height=38,
             fg_color=ThemeColor.INPUT.value,
             border_color=ThemeColor.BORDER.value,
-            text_color=ThemeColor.TEXT.value
+            text_color=ThemeColor.TEXT.value,
         )
-        self.entry_percentage.pack(pady=(0, 5), anchor="w", padx=65)
+        self.entry_percentage.pack(pady=(0, 5), anchor='w', padx=65)
 
         self.percentage_error_label = ctk.CTkLabel(
             self.frame,
-            text="",
+            text='',
             text_color=ThemeColor.DANGER.value,
-            font=("Arial", 11)
+            font=('Arial', 11),
         )
-        self.percentage_error_label.pack(anchor="w", padx=65, pady=(0, 2))
+        self.percentage_error_label.pack(anchor='w', padx=65, pady=(0, 2))
 
         # Threshold
         self.label_threshold = ctk.CTkLabel(
             self.frame,
-            text="Threshold (0-1)",
-            font=("Arial", 13, "bold"),
-            text_color=ThemeColor.TEXT.value
+            text='Threshold (0-1)',
+            font=('Arial', 13, 'bold'),
+            text_color=ThemeColor.TEXT.value,
         )
-        self.label_threshold.pack(anchor="w", padx=65, pady=2)
+        self.label_threshold.pack(anchor='w', padx=65, pady=2)
 
         self.entry_threshold = ctk.CTkEntry(
             self.frame,
-            placeholder_text="Ex: 0.5",
+            placeholder_text='Ex: 0.5',
             width=390,
             height=38,
             fg_color=ThemeColor.INPUT.value,
             border_color=ThemeColor.BORDER.value,
-            text_color=ThemeColor.TEXT.value
+            text_color=ThemeColor.TEXT.value,
         )
-        self.entry_threshold.pack(pady=(0, 5), anchor="w", padx=65)
+        self.entry_threshold.pack(pady=(0, 5), anchor='w', padx=65)
 
         self.threshold_error_label = ctk.CTkLabel(
             self.frame,
-            text="",
+            text='',
             text_color=ThemeColor.DANGER.value,
-            font=("Arial", 11)
+            font=('Arial', 11),
         )
-        self.threshold_error_label.pack(anchor="w", padx=65, pady=(0, 2))
+        self.threshold_error_label.pack(anchor='w', padx=65, pady=(0, 2))
 
         # Change Rate (CR)
         self.label_cr = ctk.CTkLabel(
             self.frame,
-            text="CR (0-1)",
-            font=("Arial", 13, "bold"),
-            text_color=ThemeColor.TEXT.value
+            text='CR (0-1)',
+            font=('Arial', 13, 'bold'),
+            text_color=ThemeColor.TEXT.value,
         )
-        self.label_cr.pack(anchor="w", padx=65, pady=2)
+        self.label_cr.pack(anchor='w', padx=65, pady=2)
 
         self.entry_cr = ctk.CTkEntry(
             self.frame,
-            placeholder_text="Ex: 0.5",
+            placeholder_text='Ex: 0.5',
             width=390,
             height=38,
             fg_color=ThemeColor.INPUT.value,
             border_color=ThemeColor.BORDER.value,
-            text_color=ThemeColor.TEXT.value
+            text_color=ThemeColor.TEXT.value,
         )
-        self.entry_cr.pack(pady=(0, 5), anchor="w", padx=65)
+        self.entry_cr.pack(pady=(0, 5), anchor='w', padx=65)
 
         self.cr_error_label = ctk.CTkLabel(
             self.frame,
-            text="",
+            text='',
             text_color=ThemeColor.DANGER.value,
-            font=("Arial", 11)
+            font=('Arial', 11),
         )
-        self.cr_error_label.pack(anchor="w", padx=65, pady=(0, 2))
+        self.cr_error_label.pack(anchor='w', padx=65, pady=(0, 2))
 
         # Classificadores
         self.label_classifiers = ctk.CTkLabel(
             self.frame,
-            text="Selecione os classificadores",
-            font=("Arial", 15, "bold"),
-            text_color=ThemeColor.TITLE.value
+            text='Selecione os classificadores',
+            font=('Arial', 15, 'bold'),
+            text_color=ThemeColor.TITLE.value,
         )
-        self.label_classifiers.pack(anchor="w", padx=65, pady=(3, 5))
+        self.label_classifiers.pack(anchor='w', padx=65, pady=(3, 5))
 
         self.classifiers = [
-            "KNN",
-            "Naive Bayes",
-            "Decision Tree",
-            "Random Forest",
-            "Logistic Regression",
-            "Neural Network"
+            'KNN',
+            'Naive Bayes',
+            'Decision Tree',
+            'Random Forest',
+            'Logistic Regression',
+            'Neural Network',
         ]
 
         self.classifiers_vars = {}
 
         # Organização em duas colunas
         self.classifier_frame = ctk.CTkFrame(
-            self.frame,
-            fg_color="transparent"
+            self.frame, fg_color='transparent'
         )
-        self.classifier_frame.pack(anchor="w", padx=65)
+        self.classifier_frame.pack(anchor='w', padx=65)
 
         for index, classifier in enumerate(self.classifiers):
             var = ctk.BooleanVar(value=False)
@@ -162,53 +160,49 @@ class ParameterForm(ctk.CTk):
                 self.classifier_frame,
                 text=classifier,
                 variable=var,
-                font=("Arial", 12),
+                font=('Arial', 12),
                 checkbox_width=20,
                 checkbox_height=20,
                 fg_color=ThemeColor.PRIMARY.value,
                 hover_color=ThemeColor.PRIMARY_HOVER.value,
-                text_color=ThemeColor.TEXT.value
+                text_color=ThemeColor.TEXT.value,
             )
 
             row = index // 2
             column = index % 2
 
             checkbox.grid(
-                row=row,
-                column=column,
-                padx=(0, 30),
-                pady=5,
-                sticky="w"
+                row=row, column=column, padx=(0, 30), pady=5, sticky='w'
             )
 
             self.classifiers_vars[classifier] = var
 
         self.classifiers_error_label = ctk.CTkLabel(
             self.frame,
-            text="",
+            text='',
             text_color=ThemeColor.DANGER.value,
-            font=("Arial", 11)
+            font=('Arial', 11),
         )
-        self.classifiers_error_label.pack(anchor="w", padx=65, pady=(0, 2))
+        self.classifiers_error_label.pack(anchor='w', padx=65, pady=(0, 2))
 
         # Botão para confirmar os parâmetros
         self.button_confirm = ctk.CTkButton(
             self.frame,
-            text="Confirmar parâmetros",
+            text='Confirmar parâmetros',
             width=390,
             height=40,
             fg_color=ThemeColor.PRIMARY.value,
             hover_color=ThemeColor.PRIMARY_HOVER.value,
-            command=self.collect_parameters
+            command=self.collect_parameters,
         )
         self.button_confirm.pack(pady=(10, 5))
 
         # Mensagem de retorno
         self.status_label = ctk.CTkLabel(
             self.frame,
-            text="",
+            text='',
             text_color=ThemeColor.TEXT.value,
-            font=("Arial", 14, "bold")
+            font=('Arial', 14, 'bold'),
         )
         self.status_label.pack(pady=5)
 
@@ -224,50 +218,46 @@ class ParameterForm(ctk.CTk):
         ]
 
         # Limpa mensagens anteriores
-        self.percentage_error_label.configure(text="")
-        self.threshold_error_label.configure(text="")
-        self.cr_error_label.configure(text="")
-        self.classifiers_error_label.configure(text="")
-        self.status_label.configure(text="")
+        self.percentage_error_label.configure(text='')
+        self.threshold_error_label.configure(text='')
+        self.cr_error_label.configure(text='')
+        self.classifiers_error_label.configure(text='')
+        self.status_label.configure(text='')
 
         result = validate_parameters(
-            labeled_percentage,
-            threshold,
-            cr,
-            selected_classifiers
+            labeled_percentage, threshold, cr, selected_classifiers
         )
 
-        #se houver algum erro exibe todos
-        if "errors" in result:
-            errors = result["errors"]
+        # se houver algum erro exibe todos
+        if 'errors' in result:
+            errors = result['errors']
 
             self.percentage_error_label.configure(
-                text=errors.get("labeled_percentage", "")
+                text=errors.get('labeled_percentage', '')
             )
-            
+
             self.threshold_error_label.configure(
-                text=errors.get("threshold", "")
+                text=errors.get('threshold', '')
             )
-            
-            self.cr_error_label.configure(
-                text=errors.get("cr", "")
-            )
-            
+
+            self.cr_error_label.configure(text=errors.get('cr', ''))
+
             self.classifiers_error_label.configure(
-                text=errors.get("classifiers", "")
+                text=errors.get('classifiers', '')
             )
 
             return
-        #se não houver erros
-        self.parameters = result["parameters"]
+        # se não houver erros
+        self.parameters = result['parameters']
 
         self.status_label.configure(
-        text="Parâmetros validados com sucesso!",
-        text_color=ThemeColor.SUCCESS.value
-    )
+            text='Parâmetros validados com sucesso!',
+            text_color=ThemeColor.SUCCESS.value,
+        )
 
         print(self.parameters)
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     app = ParameterForm()
     app.mainloop()
