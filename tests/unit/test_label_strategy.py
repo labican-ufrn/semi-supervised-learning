@@ -68,13 +68,13 @@ class TestLabelingStrategy(TestCase):
     def test_should_raise_type_error_when_try_to_call_label_instances_in_superclass(
         self,
     ):  # NOQA
-        with self.assertRaises(TypeError) as err:
+        with self.assertRaises(TypeError):
             LabelingStrategy()
 
     def test_should_raise_not_implemented_when_try_to_call_label_instances_in_superclass(
         self,
     ):  # NOQA
-        with self.assertRaises(NotImplementedError) as err:
+        with self.assertRaises(NotImplementedError):
             StrategyNoImplementMock().label_instances(np.array([]))
 
     def test_should_initiate_when_try_to_call_label_instances(self):

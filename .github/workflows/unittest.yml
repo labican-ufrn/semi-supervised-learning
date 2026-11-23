@@ -28,7 +28,7 @@ jobs:
 
       - name: Run unittests in the code
         run: |
-          python -m unittest discover tests -v
+          python -m unittest discover tests/unit/ -v
 
       - name: Build release distributions
         run: |

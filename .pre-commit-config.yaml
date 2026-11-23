@@ -15,7 +15,6 @@ repos:
     - id: lint
       name: ruff linter
       entry: ruff check
-      files: ^mlabican/
       language: system
       types: [python]
 
@@ -28,16 +27,9 @@ repos:
 
     - id: unit-tests
       name: Unit tests w/ coverage
-      entry: coverage run
+      entry: bash -c "coverage erase && coverage run -m unittest discover tests/unit/ && coverage report"
       language: system
       pass_filenames: false
+      always_run: true
       verbose: true
-      types: [python]
-
-    - id: coverage
-      name: Coverage Report
-      entry: coverage report
-      language: system
-      pass_filenames: false
-      verbose: true
-      types: [python]
+      stages: [pre-commit]

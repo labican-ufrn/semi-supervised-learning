@@ -76,6 +76,7 @@ class FlexCon(SelfTrainingClassifier):
 
         # Just type definitions for easy syntax
         self.cl_memory: np.ndarray
+        self.transduction_: npt.NDArray[np.int64]
         self.labeled_iter_: npt.NDArray[np.int64]
         self.threshold: float
 
@@ -124,7 +125,7 @@ class FlexCon(SelfTrainingClassifier):
         self.labeled_iter_[has_label] = 0
         reduce_times = 0
 
-        self.cl_memory = np.zeros((X.shape[0], len(np.unique(y[has_label]))))
+        self.cl_memory = np.zeros((len(X), len(np.unique(y[has_label]))))
 
         # 2. Main loop
         while (self.n_iter_ < self.max_iter) and not all(has_label):
