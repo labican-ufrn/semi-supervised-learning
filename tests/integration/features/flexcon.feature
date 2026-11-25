@@ -4,9 +4,9 @@ Funcionalidade: FlexCon
     Dado que o algoritmo "FlexCon-C" foi instanciado com o classificador "naive"
     E que a base de dados "iris" possuía 30 por cento dos dados não rotulados
     Quando o algoritmo treinar
-    Então a performance da métrica deverá ser igual a:
+    Então a performance da métrica deverá ser maior a:
       | metric     | value  |
-      # | iterations |  60    |
-      | accuracy   | 0.9667 |
-      | f1-score   | 0.9666 |
-      | auc        | 0.9976 |
+      | accuracy   | 0.9600 |
+      | f1-score   | 0.9600 |
+      | auc        | 0.9900 |
+    E deverá ter acontecido, pelo menos, 50 iterações

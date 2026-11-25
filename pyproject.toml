@@ -192,7 +192,7 @@ show_timings = true
 show_skipped = true
 
 lang = "pt"
-paths = ["tests/integration"]
+paths = ["tests/integration/features"]
 
 # Define default tags to run or skip (e.g., skip slow tests by default)
 # default_tags = ~@slow
