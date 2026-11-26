@@ -71,8 +71,7 @@ gui = [
 ]
 
 all = [
-    { include-group = "dev" },
-    { include-group = "gui" },
+    "mlabican[gui,dev]",
 ]
 
 [project.scripts]
