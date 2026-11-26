@@ -1,6 +1,9 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+default_install_hook_types: [pre-commit, pre-push]
+default_stages: [pre-commit]
 fail_fast: true
+
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
@@ -33,7 +36,6 @@ repos:
       pass_filenames: false
       always_run: true
       verbose: true
-      stages: [pre-commit]
 
     - id: integration-tests
       name: Full test suite & combined coverage (pre-push)
