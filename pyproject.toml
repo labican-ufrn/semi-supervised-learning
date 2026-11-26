@@ -70,6 +70,12 @@ gui = [
     "customtkinter==6.0.0",
 ]
 
+pipeline = [
+    "mlabican[gui]",
+    "behave",
+    "coverage",
+]
+
 all = [
     "mlabican[gui,dev]",
 ]
