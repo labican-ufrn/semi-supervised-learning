@@ -70,6 +70,11 @@ gui = [
     "customtkinter==6.0.0",
 ]
 
+all = [
+    { include-group = "dev" },
+    { include-group = "gui" },
+]
+
 [project.scripts]
 mlabican-gui = "mlabican.gui.launcher:launch_parameter_gui"
 
@@ -194,11 +199,10 @@ show_skipped = true
 lang = "pt"
 paths = ["tests/integration/features"]
 
-# Define default tags to run or skip (e.g., skip slow tests by default)
-# default_tags = ~@slow
-
-# Specify formatters (e.g., plain, pretty, progress)
-format = ["progress"]
+default_format = "pretty"
+default_tags = ["not (@slow or @wip)"]
+junit = true
+junit_directory = "reports"
 
 [tool.behave.userdata]
 BEHAVE_DEBUG_ON_ERROR = false
