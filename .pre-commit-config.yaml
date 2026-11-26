@@ -5,43 +5,44 @@ default_stages: [pre-commit]
 fail_fast: true
 
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v6.0.0
-  hooks:
-  - id: trailing-whitespace
-  - id: end-of-file-fixer
-  - id: debug-statements
-    exclude: tests/integration/features/environment.py
-  - id: check-yaml
-  - id: check-added-large-files
-- repo: local
-  hooks:
-    - id: lint
-      name: ruff linter
-      entry: ruff check
-      language: system
-      types: [python]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: debug-statements
+        exclude: tests/integration/features/environment.py
+      - id: check-yaml
+      - id: check-added-large-files
+  - repo: local
+    hooks:
+      - id: lint
+        name: ruff linter
+        entry: ruff check
+        language: system
+        types: [python]
 
-    - id: prettier
-      name: ruff format - pretty code
-      entry: ruff format
-      files: ^mlabican/
-      language: system
-      types: [python]
+      - id: prettier
+        name: ruff format - pretty code
+        entry: ruff format
+        files: ^mlabican/
+        language: system
+        types: [python]
 
-    - id: unit-tests
-      name: Unit tests w/ coverage
-      entry: bash -c "coverage erase && coverage run -m unittest discover -s tests/unit/ && coverage report"
-      language: system
-      pass_filenames: false
-      always_run: true
-      verbose: true
+      - id: unit-tests
+        name: Unit tests w/ coverage
+        entry: bash -c "coverage run -m unittest discover -s tests/unit/ && coverage report"
+        language: system
+        pass_filenames: false
+        always_run: true
+        verbose: true
 
-    - id: integration-tests
-      name: Full test suite & combined coverage (pre-push)
-      entry: bash -c "coverage erase && coverage run -m behave && coverage report"
-      language: system
-      pass_filenames: false
-      always_run: true
-      verbose: true
-      stages: [pre-push]
+      - id: integration-tests
+        name: Integration tests (pre-push)
+        # entry: bash -c "coverage run -m behave && coverage report"
+        entry: behave
+        language: system
+        pass_filenames: false
+        always_run: true
+        verbose: true
+        stages: [pre-push]
