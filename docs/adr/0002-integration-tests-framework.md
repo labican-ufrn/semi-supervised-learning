@@ -1,7 +1,7 @@
-# ADR 001: Escolha de Framework BDD para Testes de Integração de ML
+# ADR 0002: Escolha de Framework BDD para Testes de Integração de ML
 
 ## Status
-**Proposto**
+**Aprovado**
 
 ## Contexto
 
