@@ -58,6 +58,7 @@ Issues = "https://github.com/labican-ufrn/semi-supervised-learning/issues"
 
 [project.optional-dependencies]
 dev = [
+    "behave",
     "coverage",
     "ipdb",
     "isort",
@@ -68,6 +69,19 @@ dev = [
 gui = [
     "customtkinter==6.0.0",
 ]
+
+pipeline = [
+    "mlabican[gui]",
+    "behave",
+    "coverage",
+]
+
+all = [
+    "mlabican[gui,dev]",
+]
+
+[project.scripts]
+mlabican-gui = "mlabican.gui.launcher:launch_parameter_gui"
 
 # ==========================================
 # RUFF CONFIGURATION
@@ -173,3 +187,27 @@ format = "text"
 [tool.coverage.run]
 branch = true
 source = ["mlabican"]
+
+# ==========================================
+# BEHAVE CONFIGURATION
+# ==========================================
+[tool.behave]
+log_capture = true
+stderr_capture = true
+stdout_capture = true
+
+stop = false
+summary = true
+show_timings = true
+show_skipped = true
+
+lang = "pt"
+paths = ["tests/integration/features"]
+
+default_format = "pretty"
+default_tags = ["not (@slow or @wip)"]
+junit = true
+junit_directory = "reports"
+
+[tool.behave.userdata]
+BEHAVE_DEBUG_ON_ERROR = false
