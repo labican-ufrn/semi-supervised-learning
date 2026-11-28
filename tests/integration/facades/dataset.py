@@ -8,7 +8,16 @@ class DatasetFacade(BaseFacade):
     """Facade for dataset in the context of BDD tests."""
 
     def initialize(self, dataset: str, ssl_rate: int) -> None:
-        """Initialize the dataset with the specified SSL rate."""
+        """
+        Initialize the dataset with the specified SSL rate.
+
+        Args:
+            dataset (str): The name of the dataset to initialize.
+                Currently, only 'iris' is supported.
+            ssl_rate (int): A percentage value between 0 and 100
+                representing the rate of unlabeled data points in the
+                dataset.
+        """
         rng = np.random.RandomState(42)
         iris = datasets.load_iris()
         y_true = iris.target.copy()
